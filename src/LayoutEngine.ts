@@ -193,10 +193,18 @@ export function calculateLayout(
       const childHeight = maxChildY - minChildY;
       const offsetY = currentY - minChildY;
 
+      let offsetX = 0;
+      if (normType === "down" || normType === "up" || normType === "bidirectional") {
+        const childRootPos = childResult.positions.get(child.id);
+        if (childRootPos) {
+          offsetX = -(childRootPos.x + childRootPos.width / 2);
+        }
+      }
+
       for (const [id, pos] of childResult.positions.entries()) {
         positions.set(id, {
           id: pos.id,
-          x: pos.x,
+          x: pos.x + offsetX,
           y: pos.y + offsetY,
           width: pos.width,
           height: pos.height
