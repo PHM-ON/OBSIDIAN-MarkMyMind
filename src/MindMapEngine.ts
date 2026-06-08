@@ -161,7 +161,7 @@ export class MindMapEngine {
         .attr("fill", "none")
         .attr("stroke", parent.color ?? "#6366f1")
         .attr("stroke-width", this.settings.connectionWidth !== undefined ? this.settings.connectionWidth : 5)
-        .attr("stroke-linecap", "round");
+        .attr("stroke-linecap", "butt");
     });
 
     // Nós
