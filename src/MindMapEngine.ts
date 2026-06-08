@@ -39,6 +39,8 @@ export class MindMapEngine {
   private initialized = false;
   public selectedNodeId: string | null = null;
   public selectedNodeIds: Set<string> = new Set();
+  public isEditing = false;
+  private layoutLockCleanup: (() => void) | null = null;
 
   constructor(
     container: HTMLElement,
@@ -913,6 +915,8 @@ export class MindMapEngine {
   private removeInlineEditor(): void {
     const old = this.container.querySelector(".mm-inline-editor");
     if (old) old.remove();
+    this.isEditing = false;
+    this.unlockLayoutAfterEditing();
   }
 
   private createInlineInput(opts: {
@@ -942,7 +946,12 @@ export class MindMapEngine {
 
     wrap.appendChild(el);
     this.container.appendChild(wrap);
-    el.focus();
+
+    // Marca que estamos editando e trava o layout contra o teclado Android
+    this.isEditing = true;
+    this.lockLayoutForEditing();
+
+    el.focus({ preventScroll: true });
     if (opts.initialValue) el.select();
 
     let committed = false;
@@ -971,8 +980,96 @@ export class MindMapEngine {
       if (ev.key === "Escape") {
         el.removeEventListener("blur", commit);
         wrap.remove();
+        this.isEditing = false;
+        this.unlockLayoutAfterEditing();
       }
     });
+  }
+
+  /**
+   * Trava o layout inteiro contra o teclado virtual do Android.
+   * Funciona em 3 camadas:
+   * 1. Trava a ALTURA da view (.markmymind-view) e do workspace em pixels fixos
+   *    → impede que o resize do WebView encolha os containers
+   * 2. Trava o SCROLL de todos os containers pai
+   *    → impede que o Android empurre o conteúdo para cima
+   * 3. Adiciona classe CSS para overrides extras via stylesheet
+   */
+  private lockLayoutForEditing(): void {
+    const cleanupFns: (() => void)[] = [];
+
+    // ─── 1. Travar alturas dos containers ────────────────────────────────────
+    // Sobe pela cadeia de pais travando cada um na altura atual
+    const lockedEls: { el: HTMLElement; origHeight: string; origMinHeight: string; origOverflow: string }[] = [];
+    let walker: HTMLElement | null = this.container;
+    // Trava: canvas → view (.markmymind-view) → workspace-leaf-content → workspace-leaf
+    // Para depois de 4 níveis para não afetar o layout global do Obsidian
+    let levels = 0;
+    while (walker && levels < 4) {
+      const rect = walker.getBoundingClientRect();
+      lockedEls.push({
+        el: walker,
+        origHeight: walker.style.height,
+        origMinHeight: walker.style.minHeight,
+        origOverflow: walker.style.overflow,
+      });
+      walker.style.height = `${rect.height}px`;
+      walker.style.minHeight = `${rect.height}px`;
+      walker.style.overflow = 'clip';
+      walker = walker.parentElement;
+      levels++;
+    }
+    cleanupFns.push(() => {
+      for (const { el, origHeight, origMinHeight, origOverflow } of lockedEls) {
+        el.style.height = origHeight;
+        el.style.minHeight = origMinHeight;
+        el.style.overflow = origOverflow;
+      }
+    });
+
+    // ─── 2. Travar scroll em todos os pais ───────────────────────────────────
+    const scrollListeners: { target: Element | Window; handler: EventListener }[] = [];
+    const lockScroll = (ev: Event) => {
+      const t = ev.target as Element;
+      if (t && t.scrollTop !== undefined) t.scrollTop = 0;
+    };
+    let scrollWalker: HTMLElement | null = this.container;
+    while (scrollWalker) {
+      scrollWalker.scrollTop = 0;
+      scrollWalker.addEventListener('scroll', lockScroll, { passive: false });
+      scrollListeners.push({ target: scrollWalker, handler: lockScroll });
+      scrollWalker = scrollWalker.parentElement;
+    }
+    const windowLock = () => window.scrollTo(0, 0);
+    window.addEventListener('scroll', windowLock, { passive: false });
+    scrollListeners.push({ target: window, handler: windowLock });
+    cleanupFns.push(() => {
+      for (const { target, handler } of scrollListeners) {
+        target.removeEventListener('scroll', handler);
+      }
+    });
+
+    // ─── 3. Classe CSS de segurança ──────────────────────────────────────────
+    this.container.classList.add('mm-editing-active');
+    const viewEl = this.container.parentElement;
+    if (viewEl) viewEl.classList.add('mm-editing-active');
+    cleanupFns.push(() => {
+      this.container.classList.remove('mm-editing-active');
+      if (viewEl) viewEl.classList.remove('mm-editing-active');
+    });
+
+    this.layoutLockCleanup = () => {
+      for (const fn of cleanupFns) fn();
+      cleanupFns.length = 0;
+    };
+  }
+
+  /** Restaura o layout ao estado original após fechar o editor inline */
+  private unlockLayoutAfterEditing(): void {
+    if (this.layoutLockCleanup) {
+      this.layoutLockCleanup();
+      this.layoutLockCleanup = null;
+    }
   }
 
   // ─── Controles Públicos ────────────────────────────────────────────────────

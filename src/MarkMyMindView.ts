@@ -163,7 +163,13 @@ export class MarkMyMindView extends ItemView {
 
     this.initEngine();
 
-    const resizeObs = new ResizeObserver(() => this.engine?.resize());
+    // Bloqueia o resize do mapa quando o usuário está editando um nó inline,
+    // para evitar que o resize do Android (ao abrir teclado) quebre o layout
+    const resizeObs = new ResizeObserver(() => {
+      if (!this.engine?.isEditing) {
+        this.engine?.resize();
+      }
+    });
     resizeObs.observe(this.canvasEl);
     this.register(() => resizeObs.disconnect());
   }
