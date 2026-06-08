@@ -6,7 +6,7 @@
  */
 
 import * as d3 from "d3";
-import { MarkdownRenderer, Component, Notice } from "obsidian";
+import { MarkdownRenderer, Component, Notice, Platform } from "obsidian";
 import { MindNode, getLevelColor, assignColors, findNodeById } from "./MarkdownParser";
 import {
   calculateLayout, LayoutType, NodePosition,
@@ -197,6 +197,10 @@ export class MindMapEngine {
 
         const dragBehavior = d3.drag<SVGGElement, unknown>()
           .filter((event) => {
+            // Se for mobile e o nó estiver selecionado, não inicia o drag para permitir o scroll
+            if (Platform.isMobile && this.selectedNodeIds.has(node.id)) {
+              return false;
+            }
             // Ignora se o clique for com botão direito
             if (event.button !== 0) return false;
             // Ignora se o clique foi em um botão interativo (smart-btn, delete)
@@ -589,6 +593,17 @@ export class MindMapEngine {
         noteNode.addEventListener("wheel", (e) => {
           e.stopPropagation();
         }, { passive: true });
+
+        // Impede que o scroll no mobile arraste o canvas inteiro ou o bloco quando selecionado
+        const stopTouchPropagation = (e: TouchEvent) => {
+          if (this.selectedNodeIds.has(node.id)) {
+            e.stopPropagation();
+          }
+        };
+        noteNode.addEventListener("touchstart", stopTouchPropagation, { passive: true });
+        noteNode.addEventListener("touchmove", stopTouchPropagation, { passive: true });
+        noteNode.addEventListener("touchend", stopTouchPropagation, { passive: true });
+        noteNode.addEventListener("touchcancel", stopTouchPropagation, { passive: true });
       }
     }
   }
