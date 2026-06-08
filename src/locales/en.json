@@ -32,7 +32,9 @@
     "levelTooltip": "Expand or collapse the nodes down to the selected depth level",
     "all": "All",
     "titlesOnly": "View Titles Only",
-    "titlesOnlyTooltip": "View Titles Only (T)\nOn: Shows only titles in the block.\nOff: Shows all content in the block.",
+    "titlesOnlyTooltipAll": "View Titles Only (T)\nCurrent mode: Show all (Text always visible)",
+    "titlesOnlyTooltipSelected": "View Titles Only (T)\nCurrent mode: Auto-expand selected (Shows text only for the selected block)",
+    "titlesOnlyTooltipNone": "View Titles Only (T)\nCurrent mode: Titles only (Text always hidden)",
     "singleH1Root": "Multiple Main Blocks",
     "singleH1RootTooltip": "H1 Title Aggregator (G)\nOn: Groups all title blocks (#H1) into a single flow.\nOff: Separates title blocks (#H1) into individual flows.",
     "settings": "⚙️ View"

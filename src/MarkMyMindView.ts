@@ -227,19 +227,13 @@ export class MarkMyMindView extends ItemView {
 
     // 3. Apenas Títulos (📑) - Acesso rápido e H1 Único como Raiz (🌳)
     this.titlesBtn = toolbar.createEl("button", {
-      cls: `markmymind-toolbar-btn ${!this.settings.showNoteText ? "active" : ""}`,
+      cls: "markmymind-toolbar-btn",
     });
     setIcon(this.titlesBtn, "type");
-    setTooltip(this.titlesBtn, t("toolbar.titlesOnlyTooltip"));
+    this.updateTitlesBtnVisual();
 
     this.titlesBtn.addEventListener("click", async () => {
-      this.settings.showNoteText = !this.settings.showNoteText;
-      this.titlesBtn?.classList.toggle("active", !this.settings.showNoteText);
-      await this.saveSettings();
-      if (this.currentRoot) {
-        this.engine?.render(this.currentRoot, this.currentLayout);
-        this.engine?.fitView();
-      }
+      await this.cycleTitlesState();
     });
 
     this.singleH1RootBtn = toolbar.createEl("button", {
@@ -1464,13 +1458,7 @@ export class MarkMyMindView extends ItemView {
         this.engine?.focusOnSelected();
       } else if (isTitlesOnlyKey) {
         e.preventDefault();
-        this.settings.showNoteText = !this.settings.showNoteText;
-        this.titlesBtn?.classList.toggle("active", !this.settings.showNoteText);
-        this.saveSettings();
-        if (this.currentRoot) {
-          this.engine?.render(this.currentRoot, this.currentLayout);
-          this.engine?.fitView();
-        }
+        this.cycleTitlesState();
       } else if (isSingleH1RootKey) {
         e.preventDefault();
         this.settings.singleH1Root = !this.settings.singleH1Root;
@@ -1566,6 +1554,46 @@ export class MarkMyMindView extends ItemView {
     if (state.file && typeof state.file === "string") {
       const file = this.app.vault.getAbstractFileByPath(state.file);
       if (file instanceof TFile) await this.loadFile(file);
+    }
+    this.updateTitlesBtnVisual();
+  }
+
+  private async cycleTitlesState(): Promise<void> {
+    if (this.settings.showNoteText === true) {
+      this.settings.showNoteText = false;
+      this.settings.autoExpandSelected = true;
+    } else if (this.settings.autoExpandSelected === true) {
+      this.settings.showNoteText = false;
+      this.settings.autoExpandSelected = false;
+    } else {
+      this.settings.showNoteText = true;
+      this.settings.autoExpandSelected = false;
+    }
+
+    await this.saveSettings();
+    this.updateTitlesBtnVisual();
+
+    if (this.currentRoot) {
+      this.engine?.render(this.currentRoot, this.currentLayout);
+      this.engine?.fitView();
+    }
+  }
+
+  private updateTitlesBtnVisual(): void {
+    if (!this.titlesBtn) return;
+    
+    this.titlesBtn.removeClass("active");
+    this.titlesBtn.removeClass("active-selected-only");
+    this.titlesBtn.removeClass("active-titles-only");
+
+    if (this.settings.showNoteText === true) {
+      setTooltip(this.titlesBtn, t("toolbar.titlesOnlyTooltipAll"));
+    } else if (this.settings.autoExpandSelected === true) {
+      this.titlesBtn.addClass("active-selected-only");
+      setTooltip(this.titlesBtn, t("toolbar.titlesOnlyTooltipSelected"));
+    } else {
+      this.titlesBtn.addClass("active-titles-only");
+      setTooltip(this.titlesBtn, t("toolbar.titlesOnlyTooltipNone"));
     }
   }
 }

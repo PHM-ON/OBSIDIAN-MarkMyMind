@@ -32,7 +32,9 @@
     "levelTooltip": "Erweitere oder reduziere die Knoten bis zur ausgewählten Tiefe",
     "all": "Alle",
     "titlesOnly": "Nur Titel anzeigen",
-    "titlesOnlyTooltip": "Nur Titel anzeigen (T)\nEin: Zeigt nur Titel im Block an.\nAus: Zeigt den gesamten Inhalt des Blocks an.",
+    "titlesOnlyTooltipAll": "Nur Titel anzeigen (T)\nAktueller Modus: Alles anzeigen (Text immer sichtbar)",
+    "titlesOnlyTooltipSelected": "Nur Titel anzeigen (T)\nAktueller Modus: Automatisch erweitern bei Auswahl (Text nur für ausgewählten Block anzeigen)",
+    "titlesOnlyTooltipNone": "Nur Titel anzeigen (T)\nAktueller Modus: Nur Titel (Text immer ausgeblendet)",
     "singleH1Root": "Mehrere Hauptblöcke",
     "singleH1RootTooltip": "Mehrere Hauptblöcke (G)\nEin: Gruppiert alle Titelblöcke (#H1) in einen einzigen Fluss.\nAus: Trennt Titelblöcke (#H1) in einzelne Flüsse.",
     "settings": "⚙️ Ansicht"

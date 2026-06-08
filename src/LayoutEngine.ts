@@ -74,7 +74,15 @@ export function wrapText(text: string, charsPerLine: number): string[] {
 /**
  * Altura do bloco: calculada dinamicamente usando a mesma função wrapText e o tamanho da fonte.
  */
-export function computeNodeHeight(node: MindNode, fontSize = 12, showNoteText = true, nodeWidth = 0, maxNodeHeight = 0): number {
+export function computeNodeHeight(
+  node: MindNode,
+  fontSize = 12,
+  showNoteText = true,
+  nodeWidth = 0,
+  maxNodeHeight = 0,
+  autoExpandSelected = false,
+  selectedNodeIds: Set<string> = new Set()
+): number {
   const isRoot = node.level < 0;
   const labelSize = isRoot ? fontSize + 2 : fontSize;
   const blockWidth = computeNodeWidth(node.label, fontSize, node.level < 0 ? 0 : nodeWidth);
@@ -85,7 +93,10 @@ export function computeNodeHeight(node: MindNode, fontSize = 12, showNoteText = 
   const labelLines = wrapText(node.label, charsPerLineLabel).length;
   const lineHLabel = Math.round(labelSize * 1.3);
 
-  if (!node.noteText || !showNoteText) {
+  const isSelected = selectedNodeIds.has(node.id);
+  const shouldShowNote = node.noteText && (showNoteText || (autoExpandSelected && isSelected));
+
+  if (!shouldShowNote) {
     // Apenas título
     const labelPadding = Math.round(fontSize * 1.5);
     const calculatedH = labelLines * lineHLabel + labelPadding;
@@ -96,11 +107,13 @@ export function computeNodeHeight(node: MindNode, fontSize = 12, showNoteText = 
     const labelPadding = Math.round(fontSize * 1.2);
     const titleH = labelLines * lineHLabel + labelPadding;
 
+    const noteText = node.noteText || "";
+
     // Nota
     const noteSize = Math.max(9, fontSize - 2);
     const charWNote = noteSize * 0.52;
     const charsPerLineNote = Math.max(12, Math.floor((blockWidth - 24) / charWNote));
-    const noteLines = wrapText(node.noteText, charsPerLineNote).length;
+    const noteLines = wrapText(noteText, charsPerLineNote).length;
     const lineHNote = Math.round(noteSize * 1.25);
     const notePadding = Math.round(fontSize * 1.2);
 
@@ -112,20 +125,20 @@ export function computeNodeHeight(node: MindNode, fontSize = 12, showNoteText = 
     let extraHeight = 0;
 
     // 1. Codeblocks: triple backticks
-    const codeBlockCount = (node.noteText.match(/```/g) || []).length;
+    const codeBlockCount = (noteText.match(/```/g) || []).length;
     const numCodeBlocks = Math.floor(codeBlockCount / 2);
     if (numCodeBlocks > 0) {
       extraHeight += numCodeBlocks * 30; // 30px extra por bloco de código (margem/padding)
     }
 
     // 2. Callouts: linhas com "> [!" ou ">[! "
-    const calloutCount = (node.noteText.match(/^\s*>\s*\[!/gm) || []).length;
+    const calloutCount = (noteText.match(/^\s*>\s*\[!/gm) || []).length;
     if (calloutCount > 0) {
       extraHeight += calloutCount * 45; // 45px extra por callout (título, ícone, padding)
     }
 
     // 3. Listas (UL/OL): adiciona pequeno espaçamento por item
-    const listItemCount = (node.noteText.match(/^\s*[-*+]\s+/gm) || []).length + (node.noteText.match(/^\s*\d+\.\s+/gm) || []).length;
+    const listItemCount = (noteText.match(/^\s*[-*+]\s+/gm) || []).length + (noteText.match(/^\s*\d+\.\s+/gm) || []).length;
     if (listItemCount > 0) {
       extraHeight += listItemCount * 4;
     }
@@ -149,7 +162,9 @@ export function calculateLayout(
   fontSize = 12,
   showNoteText = true,
   nodeWidth = 0,
-  maxNodeHeight = 0
+  maxNodeHeight = 0,
+  autoExpandSelected = false,
+  selectedNodeIds: Set<string> = new Set()
 ): LayoutResult {
   const normType = normalizeLayout(type);
 
@@ -166,7 +181,7 @@ export function calculateLayout(
       const child = root.children[i];
       const originalLevel = child.level;
       child.level = -1; // trata como raiz temporária para o cálculo do sub-layout
-      const childResult = calculateLayout(child, type, fontSize, showNoteText, nodeWidth, maxNodeHeight);
+      const childResult = calculateLayout(child, type, fontSize, showNoteText, nodeWidth, maxNodeHeight, autoExpandSelected, selectedNodeIds);
       child.level = originalLevel;
 
       let minChildY = Infinity;
@@ -210,21 +225,29 @@ export function calculateLayout(
   }
 
   switch (normType) {
-    case "right": return layoutHorizontal(root, fontSize, showNoteText, nodeWidth, maxNodeHeight);
-    case "down": return layoutVertical(root, fontSize, showNoteText, nodeWidth, maxNodeHeight);
-    case "up": return layoutUp(root, fontSize, showNoteText, nodeWidth, maxNodeHeight);
-    case "bidirectional": return layoutBidirectional(root, fontSize, showNoteText, nodeWidth, maxNodeHeight);
-    default: return layoutHorizontal(root, fontSize, showNoteText, nodeWidth, maxNodeHeight);
+    case "right": return layoutHorizontal(root, fontSize, showNoteText, nodeWidth, maxNodeHeight, autoExpandSelected, selectedNodeIds);
+    case "down": return layoutVertical(root, fontSize, showNoteText, nodeWidth, maxNodeHeight, autoExpandSelected, selectedNodeIds);
+    case "up": return layoutUp(root, fontSize, showNoteText, nodeWidth, maxNodeHeight, autoExpandSelected, selectedNodeIds);
+    case "bidirectional": return layoutBidirectional(root, fontSize, showNoteText, nodeWidth, maxNodeHeight, autoExpandSelected, selectedNodeIds);
+    default: return layoutHorizontal(root, fontSize, showNoteText, nodeWidth, maxNodeHeight, autoExpandSelected, selectedNodeIds);
   }
 }
 
 // ─── LAYOUT HORIZONTAL ───────────────────────────────────────────────────────
 
-function layoutHorizontal(root: MindNode, fontSize: number, showNoteText: boolean, nodeWidth = 0, maxNodeHeight = 0): LayoutResult {
+function layoutHorizontal(
+  root: MindNode,
+  fontSize: number,
+  showNoteText: boolean,
+  nodeWidth = 0,
+  maxNodeHeight = 0,
+  autoExpandSelected = false,
+  selectedNodeIds: Set<string> = new Set()
+): LayoutResult {
   const positions = new Map<string, NodePosition>();
-  const subtreeHeights = buildSubtreeHeights(root, fontSize, showNoteText, nodeWidth, maxNodeHeight);
+  const subtreeHeights = buildSubtreeHeights(root, fontSize, showNoteText, nodeWidth, maxNodeHeight, autoExpandSelected, selectedNodeIds);
 
-  placeH(root, 0, 0, positions, subtreeHeights, fontSize, showNoteText, nodeWidth, maxNodeHeight);
+  placeH(root, 0, 0, positions, subtreeHeights, fontSize, showNoteText, nodeWidth, maxNodeHeight, autoExpandSelected, selectedNodeIds);
 
   let totalWidth = 0, totalHeight = 0;
   for (const p of positions.values()) {
@@ -243,9 +266,11 @@ function placeH(
   fontSize: number,
   showNoteText: boolean,
   nodeWidth = 0,
-  maxNodeHeight = 0
+  maxNodeHeight = 0,
+  autoExpandSelected = false,
+  selectedNodeIds: Set<string> = new Set()
 ): number {
-  const selfH = computeNodeHeight(node, fontSize, showNoteText, nodeWidth, maxNodeHeight);
+  const selfH = computeNodeHeight(node, fontSize, showNoteText, nodeWidth, maxNodeHeight, autoExpandSelected, selectedNodeIds);
   const subtreeH = subtreeHeights.get(node.id) ?? selfH;
   const selfY = startY + Math.max(0, (subtreeH - selfH) / 2);
   const w = computeNodeWidth(node.label, fontSize, node.level < 0 ? 0 : nodeWidth);
@@ -266,7 +291,7 @@ function placeH(
 
   const childX = x + w + H_GAP;
   for (const child of node.children) {
-    const ch = placeH(child, childX, childY, positions, subtreeHeights, fontSize, showNoteText, nodeWidth, maxNodeHeight);
+    const ch = placeH(child, childX, childY, positions, subtreeHeights, fontSize, showNoteText, nodeWidth, maxNodeHeight, autoExpandSelected, selectedNodeIds);
     childY += ch + V_GAP;
   }
   return subtreeH;
@@ -274,11 +299,19 @@ function placeH(
 
 // ─── LAYOUT VERTICAL ─────────────────────────────────────────────────────────
 
-function layoutVertical(root: MindNode, fontSize: number, showNoteText: boolean, nodeWidth = 0, maxNodeHeight = 0): LayoutResult {
+function layoutVertical(
+  root: MindNode,
+  fontSize: number,
+  showNoteText: boolean,
+  nodeWidth = 0,
+  maxNodeHeight = 0,
+  autoExpandSelected = false,
+  selectedNodeIds: Set<string> = new Set()
+): LayoutResult {
   const positions = new Map<string, NodePosition>();
-  const subtreeWidths = buildSubtreeWidths(root, fontSize, showNoteText, nodeWidth, maxNodeHeight);
+  const subtreeWidths = buildSubtreeWidths(root, fontSize, showNoteText, nodeWidth, maxNodeHeight, autoExpandSelected, selectedNodeIds);
 
-  placeV(root, 0, 0, positions, subtreeWidths, fontSize, showNoteText, nodeWidth, maxNodeHeight);
+  placeV(root, 0, 0, positions, subtreeWidths, fontSize, showNoteText, nodeWidth, maxNodeHeight, autoExpandSelected, selectedNodeIds);
 
   let totalWidth = 0, totalHeight = 0;
   for (const p of positions.values()) {
@@ -297,9 +330,11 @@ function placeV(
   fontSize: number,
   showNoteText: boolean,
   nodeWidth = 0,
-  maxNodeHeight = 0
+  maxNodeHeight = 0,
+  autoExpandSelected = false,
+  selectedNodeIds: Set<string> = new Set()
 ): void {
-  const selfH = computeNodeHeight(node, fontSize, showNoteText, nodeWidth, maxNodeHeight);
+  const selfH = computeNodeHeight(node, fontSize, showNoteText, nodeWidth, maxNodeHeight, autoExpandSelected, selectedNodeIds);
   const nodeW = subtreeWidths.get(node.id) ?? 160;
   const w = computeNodeWidth(node.label, fontSize, node.level < 0 ? 0 : nodeWidth);
   const selfX = startX + Math.max(0, (nodeW - w) / 2);
@@ -312,18 +347,26 @@ function placeV(
   let childX = startX;
   for (const child of node.children) {
     const cw = subtreeWidths.get(child.id) ?? (nodeWidth > 0 ? nodeWidth : 200);
-    placeV(child, childX, childY, positions, subtreeWidths, fontSize, showNoteText, nodeWidth, maxNodeHeight);
+    placeV(child, childX, childY, positions, subtreeWidths, fontSize, showNoteText, nodeWidth, maxNodeHeight, autoExpandSelected, selectedNodeIds);
     childX += cw + V_GAP;
   }
 }
 
 // ─── LAYOUT UP ───────────────────────────────────────────────────────────────
 
-function layoutUp(root: MindNode, fontSize: number, showNoteText: boolean, nodeWidth = 0, maxNodeHeight = 0): LayoutResult {
+function layoutUp(
+  root: MindNode,
+  fontSize: number,
+  showNoteText: boolean,
+  nodeWidth = 0,
+  maxNodeHeight = 0,
+  autoExpandSelected = false,
+  selectedNodeIds: Set<string> = new Set()
+): LayoutResult {
   const positions = new Map<string, NodePosition>();
-  const subtreeWidths = buildSubtreeWidths(root, fontSize, showNoteText, nodeWidth, maxNodeHeight);
+  const subtreeWidths = buildSubtreeWidths(root, fontSize, showNoteText, nodeWidth, maxNodeHeight, autoExpandSelected, selectedNodeIds);
 
-  placeUp(root, 0, 0, positions, subtreeWidths, fontSize, showNoteText, nodeWidth, maxNodeHeight);
+  placeUp(root, 0, 0, positions, subtreeWidths, fontSize, showNoteText, nodeWidth, maxNodeHeight, autoExpandSelected, selectedNodeIds);
 
   let totalWidth = 0, totalHeight = 0;
   for (const p of positions.values()) {
@@ -342,9 +385,11 @@ function placeUp(
   fontSize: number,
   showNoteText: boolean,
   nodeWidth = 0,
-  maxNodeHeight = 0
+  maxNodeHeight = 0,
+  autoExpandSelected = false,
+  selectedNodeIds: Set<string> = new Set()
 ): void {
-  const selfH = computeNodeHeight(node, fontSize, showNoteText, nodeWidth, maxNodeHeight);
+  const selfH = computeNodeHeight(node, fontSize, showNoteText, nodeWidth, maxNodeHeight, autoExpandSelected, selectedNodeIds);
   const nodeW = subtreeWidths.get(node.id) ?? 160;
   const w = computeNodeWidth(node.label, fontSize, node.level < 0 ? 0 : nodeWidth);
   const selfX = startX + Math.max(0, (nodeW - w) / 2);
@@ -356,18 +401,26 @@ function placeUp(
   let childX = startX;
   for (const child of node.children) {
     const cw = subtreeWidths.get(child.id) ?? (nodeWidth > 0 ? nodeWidth : 200);
-    const childSelfH = computeNodeHeight(child, fontSize, showNoteText, nodeWidth, maxNodeHeight);
+    const childSelfH = computeNodeHeight(child, fontSize, showNoteText, nodeWidth, maxNodeHeight, autoExpandSelected, selectedNodeIds);
     const childY = y - H_GAP - childSelfH;
-    placeUp(child, childX, childY, positions, subtreeWidths, fontSize, showNoteText, nodeWidth, maxNodeHeight);
+    placeUp(child, childX, childY, positions, subtreeWidths, fontSize, showNoteText, nodeWidth, maxNodeHeight, autoExpandSelected, selectedNodeIds);
     childX += cw + V_GAP;
   }
 }
 
 // ─── LAYOUT BIDIRECTIONAL ────────────────────────────────────────────────────
 
-function layoutBidirectional(root: MindNode, fontSize: number, showNoteText: boolean, nodeWidth = 0, maxNodeHeight = 0): LayoutResult {
+function layoutBidirectional(
+  root: MindNode,
+  fontSize: number,
+  showNoteText: boolean,
+  nodeWidth = 0,
+  maxNodeHeight = 0,
+  autoExpandSelected = false,
+  selectedNodeIds: Set<string> = new Set()
+): LayoutResult {
   const positions = new Map<string, NodePosition>();
-  const subtreeHeights = buildSubtreeHeights(root, fontSize, showNoteText, nodeWidth, maxNodeHeight);
+  const subtreeHeights = buildSubtreeHeights(root, fontSize, showNoteText, nodeWidth, maxNodeHeight, autoExpandSelected, selectedNodeIds);
 
   // Divide os filhos entre direita e esquerda de acordo com o lado marcado (side),
   // ou alternando por índice se não estiver definido para manter compatibilidade.
@@ -390,27 +443,27 @@ function layoutBidirectional(root: MindNode, fontSize: number, showNoteText: boo
   // Calcula a altura acumulada de cada lado
   let rightSubtreeHeight = 0;
   rightChildren.forEach((child, i) => {
-    const ch = subtreeHeights.get(child.id) ?? computeNodeHeight(child, fontSize, showNoteText, nodeWidth, maxNodeHeight);
+    const ch = subtreeHeights.get(child.id) ?? computeNodeHeight(child, fontSize, showNoteText, nodeWidth, maxNodeHeight, autoExpandSelected, selectedNodeIds);
     rightSubtreeHeight += ch + (i < rightChildren.length - 1 ? V_GAP : 0);
   });
 
   let leftSubtreeHeight = 0;
   leftChildren.forEach((child, i) => {
-    const ch = subtreeHeights.get(child.id) ?? computeNodeHeight(child, fontSize, showNoteText, nodeWidth, maxNodeHeight);
+    const ch = subtreeHeights.get(child.id) ?? computeNodeHeight(child, fontSize, showNoteText, nodeWidth, maxNodeHeight, autoExpandSelected, selectedNodeIds);
     leftSubtreeHeight += ch + (i < leftChildren.length - 1 ? V_GAP : 0);
   });
 
   // Posiciona a raiz no centro (0, 0)
   const rootW = computeNodeWidth(root.label, fontSize, 0);
-  const rootH = computeNodeHeight(root, fontSize, showNoteText, 0, maxNodeHeight);
+  const rootH = computeNodeHeight(root, fontSize, showNoteText, 0, maxNodeHeight, autoExpandSelected, selectedNodeIds);
   positions.set(root.id, { id: root.id, x: -rootW / 2, y: -rootH / 2, width: rootW, height: rootH });
 
   // Posiciona lado direito (cresce para x positivo)
   let rightY = -rightSubtreeHeight / 2;
   const rightX = rootW / 2 + H_GAP;
   rightChildren.forEach((child) => {
-    placeH(child, rightX, rightY, positions, subtreeHeights, fontSize, showNoteText, nodeWidth, maxNodeHeight);
-    const ch = subtreeHeights.get(child.id) ?? computeNodeHeight(child, fontSize, showNoteText, nodeWidth, maxNodeHeight);
+    placeH(child, rightX, rightY, positions, subtreeHeights, fontSize, showNoteText, nodeWidth, maxNodeHeight, autoExpandSelected, selectedNodeIds);
+    const ch = subtreeHeights.get(child.id) ?? computeNodeHeight(child, fontSize, showNoteText, nodeWidth, maxNodeHeight, autoExpandSelected, selectedNodeIds);
     rightY += ch + V_GAP;
   });
 
@@ -418,8 +471,8 @@ function layoutBidirectional(root: MindNode, fontSize: number, showNoteText: boo
   let leftY = -leftSubtreeHeight / 2;
   const leftX = -rootW / 2;
   leftChildren.forEach((child) => {
-    placeLeft(child, leftX, leftY, positions, subtreeHeights, fontSize, showNoteText, nodeWidth, maxNodeHeight);
-    const ch = subtreeHeights.get(child.id) ?? computeNodeHeight(child, fontSize, showNoteText, nodeWidth, maxNodeHeight);
+    placeLeft(child, leftX, leftY, positions, subtreeHeights, fontSize, showNoteText, nodeWidth, maxNodeHeight, autoExpandSelected, selectedNodeIds);
+    const ch = subtreeHeights.get(child.id) ?? computeNodeHeight(child, fontSize, showNoteText, nodeWidth, maxNodeHeight, autoExpandSelected, selectedNodeIds);
     leftY += ch + V_GAP;
   });
 
@@ -444,9 +497,11 @@ function placeLeft(
   fontSize: number,
   showNoteText: boolean,
   nodeWidth = 0,
-  maxNodeHeight = 0
+  maxNodeHeight = 0,
+  autoExpandSelected = false,
+  selectedNodeIds: Set<string> = new Set()
 ): number {
-  const selfH = computeNodeHeight(node, fontSize, showNoteText, nodeWidth, maxNodeHeight);
+  const selfH = computeNodeHeight(node, fontSize, showNoteText, nodeWidth, maxNodeHeight, autoExpandSelected, selectedNodeIds);
   const subtreeH = subtreeHeights.get(node.id) ?? selfH;
   const selfY = startY + Math.max(0, (subtreeH - selfH) / 2);
   const w = computeNodeWidth(node.label, fontSize, nodeWidth);
@@ -468,7 +523,7 @@ function placeLeft(
 
   const childX = x;
   for (const child of node.children) {
-    const ch = placeLeft(child, childX, childY, positions, subtreeHeights, fontSize, showNoteText, nodeWidth, maxNodeHeight);
+    const ch = placeLeft(child, childX, childY, positions, subtreeHeights, fontSize, showNoteText, nodeWidth, maxNodeHeight, autoExpandSelected, selectedNodeIds);
     childY += ch + V_GAP;
   }
   return subtreeH;
@@ -476,17 +531,34 @@ function placeLeft(
 
 // ─── HELPERS: SUBTREE DIMENSIONS ─────────────────────────────────────────────
 
-function buildSubtreeHeights(root: MindNode, fontSize: number, showNoteText: boolean, nodeWidth = 0, maxNodeHeight = 0): Map<string, number> {
+function buildSubtreeHeights(
+  root: MindNode,
+  fontSize: number,
+  showNoteText: boolean,
+  nodeWidth = 0,
+  maxNodeHeight = 0,
+  autoExpandSelected = false,
+  selectedNodeIds: Set<string> = new Set()
+): Map<string, number> {
   const map = new Map<string, number>();
-  calcSH(root, map, fontSize, showNoteText, nodeWidth, maxNodeHeight);
+  calcSH(root, map, fontSize, showNoteText, nodeWidth, maxNodeHeight, autoExpandSelected, selectedNodeIds);
   return map;
 }
 
-function calcSH(node: MindNode, map: Map<string, number>, fontSize: number, showNoteText: boolean, nodeWidth = 0, maxNodeHeight = 0): number {
-  const selfH = computeNodeHeight(node, fontSize, showNoteText, nodeWidth, maxNodeHeight);
+function calcSH(
+  node: MindNode,
+  map: Map<string, number>,
+  fontSize: number,
+  showNoteText: boolean,
+  nodeWidth = 0,
+  maxNodeHeight = 0,
+  autoExpandSelected = false,
+  selectedNodeIds: Set<string> = new Set()
+): number {
+  const selfH = computeNodeHeight(node, fontSize, showNoteText, nodeWidth, maxNodeHeight, autoExpandSelected, selectedNodeIds);
   if (node.children.length === 0 || node.collapsed) { map.set(node.id, selfH); return selfH; }
   const total = node.children.reduce(
-    (sum, c, i) => sum + calcSH(c, map, fontSize, showNoteText, nodeWidth, maxNodeHeight) + (i < node.children.length - 1 ? V_GAP : 0), 0
+    (sum, c, i) => sum + calcSH(c, map, fontSize, showNoteText, nodeWidth, maxNodeHeight, autoExpandSelected, selectedNodeIds) + (i < node.children.length - 1 ? V_GAP : 0), 0
   );
   const h = Math.max(selfH, total);
   map.set(node.id, h);
@@ -495,17 +567,34 @@ function calcSH(node: MindNode, map: Map<string, number>, fontSize: number, show
 
 // ─── SUBTREE WIDTHS ───
 
-function buildSubtreeWidths(root: MindNode, fontSize: number, showNoteText: boolean, nodeWidth = 0, maxNodeHeight = 0): Map<string, number> {
+function buildSubtreeWidths(
+  root: MindNode,
+  fontSize: number,
+  showNoteText: boolean,
+  nodeWidth = 0,
+  maxNodeHeight = 0,
+  autoExpandSelected = false,
+  selectedNodeIds: Set<string> = new Set()
+): Map<string, number> {
   const map = new Map<string, number>();
-  calcSW(root, map, fontSize, showNoteText, nodeWidth, maxNodeHeight);
+  calcSW(root, map, fontSize, showNoteText, nodeWidth, maxNodeHeight, autoExpandSelected, selectedNodeIds);
   return map;
 }
 
-function calcSW(node: MindNode, map: Map<string, number>, fontSize: number, showNoteText: boolean, nodeWidth = 0, maxNodeHeight = 0): number {
+function calcSW(
+  node: MindNode,
+  map: Map<string, number>,
+  fontSize: number,
+  showNoteText: boolean,
+  nodeWidth = 0,
+  maxNodeHeight = 0,
+  autoExpandSelected = false,
+  selectedNodeIds: Set<string> = new Set()
+): number {
   const selfW = computeNodeWidth(node.label, fontSize, nodeWidth);
   if (node.children.length === 0 || node.collapsed) { map.set(node.id, selfW); return selfW; }
   const total = node.children.reduce(
-    (sum, c, i) => sum + calcSW(c, map, fontSize, showNoteText, nodeWidth, maxNodeHeight) + (i < node.children.length - 1 ? V_GAP : 0), 0
+    (sum, c, i) => sum + calcSW(c, map, fontSize, showNoteText, nodeWidth, maxNodeHeight, autoExpandSelected, selectedNodeIds) + (i < node.children.length - 1 ? V_GAP : 0), 0
   );
   const w = Math.max(selfW, total);
   map.set(node.id, w);

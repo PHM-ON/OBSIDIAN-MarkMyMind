@@ -129,7 +129,7 @@ export class MindMapEngine {
     assignColors(root, this.settings);
 
     const fontSize = this.settings.fontSize || 12;
-    const { positions } = calculateLayout(root, this.currentLayout, fontSize, this.settings.showNoteText, this.settings.nodeWidth, this.settings.maxNodeHeight);
+    const { positions } = calculateLayout(root, this.currentLayout, fontSize, this.settings.showNoteText, this.settings.nodeWidth, this.settings.maxNodeHeight, this.settings.autoExpandSelected, this.selectedNodeIds);
 
     const rootPos = positions.get(root.id);
     const rootCenterX = rootPos ? (rootPos.x + rootPos.width / 2) : 0;
@@ -148,7 +148,9 @@ export class MindMapEngine {
         parent, child, positions, this.currentLayout,
         fontSize, this.settings.showNoteText, this.settings.nodeWidth,
         this.settings.connectionStyle || "rounded",
-        this.settings.maxNodeHeight
+        this.settings.maxNodeHeight,
+        this.settings.autoExpandSelected,
+        this.selectedNodeIds
       );
       if (!path) return;
       this.rootGroup.append("path")
@@ -170,7 +172,7 @@ export class MindMapEngine {
 
       const color = node.color ?? getLevelColor(node.level);
       const isRoot = node.level < 0 || (this.currentRoot?.isVirtualRoot === true && node.level === 0);
-      const nodeH = computeNodeHeight(node, fontSize, this.settings.showNoteText, this.settings.nodeWidth, this.settings.maxNodeHeight);
+      const nodeH = computeNodeHeight(node, fontSize, this.settings.showNoteText, this.settings.nodeWidth, this.settings.maxNodeHeight, this.settings.autoExpandSelected, this.selectedNodeIds);
       const nodeW = pos.width;
 
       const g = this.rootGroup.append("g")
@@ -565,7 +567,9 @@ export class MindMapEngine {
 
     MarkdownRenderer.renderMarkdown(node.label, titleDiv, this.getFilePath(), this.component);
 
-    if (node.noteText && this.settings.showNoteText !== false) {
+    const isSelected = this.selectedNodeIds.has(node.id);
+    const shouldShowNote = node.noteText && (this.settings.showNoteText || (this.settings.autoExpandSelected && isSelected));
+    if (shouldShowNote) {
       titleDiv.style.margin = "0 0 4px 0";
 
       body.append("div")
@@ -587,7 +591,7 @@ export class MindMapEngine {
         .style("flex", "1");
 
       const noteNode = noteDiv.node() as HTMLElement;
-      MarkdownRenderer.renderMarkdown(node.noteText, noteNode, this.getFilePath(), this.component);
+      MarkdownRenderer.renderMarkdown(node.noteText || "", noteNode, this.getFilePath(), this.component);
 
       if (isLimitActive) {
         noteNode.addEventListener("wheel", (e) => {
@@ -859,7 +863,7 @@ export class MindMapEngine {
     const { k, x, y } = transform;
 
     const fontSize = this.settings.fontSize || 12;
-    const nodeH = computeNodeHeight(node, fontSize, this.settings.showNoteText, this.settings.nodeWidth, this.settings.maxNodeHeight);
+    const nodeH = computeNodeHeight(node, fontSize, this.settings.showNoteText, this.settings.nodeWidth, this.settings.maxNodeHeight, this.settings.autoExpandSelected, this.selectedNodeIds);
 
     const isLeft = forceLeft !== undefined ? forceLeft : (this.currentLayout === "bidirectional" && (pos.x + pos.width / 2) < 0);
     const inputW = Math.max(160, computeNodeWidth("", fontSize, this.settings.nodeWidth) * k);
@@ -904,7 +908,7 @@ export class MindMapEngine {
     const transform = d3.zoomTransform(this.svg.node()!);
     const { k, x, y } = transform;
     const fontSize = this.settings.fontSize || 12;
-    const nodeH = computeNodeHeight(node, fontSize, this.settings.showNoteText, this.settings.nodeWidth, this.settings.maxNodeHeight);
+    const nodeH = computeNodeHeight(node, fontSize, this.settings.showNoteText, this.settings.nodeWidth, this.settings.maxNodeHeight, this.settings.autoExpandSelected, this.selectedNodeIds);
 
     this.createInlineInput({
       x: pos.x * k + x, y: pos.y * k + y,
@@ -1111,7 +1115,9 @@ export class MindMapEngine {
       fontSize,
       this.settings.showNoteText,
       this.settings.nodeWidth,
-      this.settings.maxNodeHeight
+      this.settings.maxNodeHeight,
+      this.settings.autoExpandSelected,
+      this.selectedNodeIds
     );
 
     if (positions.size === 0) return;
@@ -1261,7 +1267,9 @@ export class MindMapEngine {
       fontSize,
       this.settings.showNoteText,
       this.settings.nodeWidth,
-      this.settings.maxNodeHeight
+      this.settings.maxNodeHeight,
+      this.settings.autoExpandSelected,
+      this.selectedNodeIds
     );
     const pos = positions.get(nodeId);
     if (!pos) return;
@@ -1309,7 +1317,9 @@ export class MindMapEngine {
       fontSize,
       this.settings.showNoteText,
       this.settings.nodeWidth,
-      this.settings.maxNodeHeight
+      this.settings.maxNodeHeight,
+      this.settings.autoExpandSelected,
+      this.selectedNodeIds
     );
     const pos = positions.get(this.selectedNodeId);
     if (!pos) return;
@@ -1332,7 +1342,9 @@ export class MindMapEngine {
       fontSize,
       this.settings.showNoteText,
       this.settings.nodeWidth,
-      this.settings.maxNodeHeight
+      this.settings.maxNodeHeight,
+      this.settings.autoExpandSelected,
+      this.selectedNodeIds
     );
 
     // Auto-expande se apontar para os filhos e o nó estiver colapsado
@@ -1357,15 +1369,17 @@ export class MindMapEngine {
 
     if (currentNode.collapsed && isDirectionToChildren()) {
       currentNode.collapsed = false;
-      this.render(this.currentRoot, this.currentLayout);
+      this.render(this.currentRoot!, this.currentLayout);
       // Recarrega as posições após a expansão
       const newLayout = calculateLayout(
-        this.currentRoot,
+        this.currentRoot!,
         this.currentLayout,
         fontSize,
         this.settings.showNoteText,
         this.settings.nodeWidth,
-        this.settings.maxNodeHeight
+        this.settings.maxNodeHeight,
+        this.settings.autoExpandSelected,
+        this.selectedNodeIds
       );
       positions = newLayout.positions;
     }
@@ -1456,14 +1470,16 @@ function buildPath(
   parent: MindNode, child: MindNode,
   positions: Map<string, NodePosition>, layout: LayoutType, fontSize: number, showNoteText: boolean, nodeWidth = 0,
   connectionStyle: "curved" | "rounded" | "straight" = "rounded",
-  maxNodeHeight = 0
+  maxNodeHeight = 0,
+  autoExpandSelected = false,
+  selectedNodeIds: Set<string> = new Set()
 ): string {
   const p = positions.get(parent.id);
   const c = positions.get(child.id);
   if (!p || !c) return "";
 
-  const pH = computeNodeHeight(parent, fontSize, showNoteText, nodeWidth, maxNodeHeight);
-  const cH = computeNodeHeight(child, fontSize, showNoteText, nodeWidth, maxNodeHeight);
+  const pH = computeNodeHeight(parent, fontSize, showNoteText, nodeWidth, maxNodeHeight, autoExpandSelected, selectedNodeIds);
+  const cH = computeNodeHeight(child, fontSize, showNoteText, nodeWidth, maxNodeHeight, autoExpandSelected, selectedNodeIds);
 
   const normLayout = normalizeLayout(layout);
 

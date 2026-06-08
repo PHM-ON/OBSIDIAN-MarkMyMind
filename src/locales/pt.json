@@ -32,7 +32,9 @@
     "levelTooltip": "Expanda ou recolha os nós até o nível de profundidade selecionado",
     "all": "Todos",
     "titlesOnly": "Ver Só Títulos",
-    "titlesOnlyTooltip": "Ver Só Títulos (T)\nLigado: Exibe apenas os títulos no bloco.\nDesligado: Exibe todo o conteúdo do bloco.",
+    "titlesOnlyTooltipAll": "Ver Só Títulos (T)\nModo atual: Mostrar tudo (Texto sempre visível)",
+    "titlesOnlyTooltipSelected": "Ver Só Títulos (T)\nModo atual: Auto-expandir no selecionado (Mostra o texto apenas do bloco selecionado)",
+    "titlesOnlyTooltipNone": "Ver Só Títulos (T)\nModo atual: Apenas títulos (Texto sempre oculto)",
     "singleH1Root": "Múltiplos Blocos Principais",
     "singleH1RootTooltip": "Múltiplos Blocos Principais (G)\nLigado: Agrupa todos os blocos de títulos (#H1) em um único fluxo.\nDesligado: Separa os blocos de títulos (#H1) em fluxos individuais.",
     "settings": "⚙️ Visualização"

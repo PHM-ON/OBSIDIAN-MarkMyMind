@@ -32,7 +32,9 @@
     "levelTooltip": "将节点展开或折叠到选定的深度级别",
     "all": "全部",
     "titlesOnly": "仅显示标题",
-    "titlesOnlyTooltip": "仅显示标题 (T)\n开启: 仅显示区块内的标题。\n关闭: 显示区块内的所有内容。",
+    "titlesOnlyTooltipAll": "仅显示标题 (T)\n当前模式：显示全部（文本始终可见）",
+    "titlesOnlyTooltipSelected": "仅显示标题 (T)\n当前模式：选中时自动展开（仅显示选中区块的文本）",
+    "titlesOnlyTooltipNone": "仅显示标题 (T)\n当前模式：仅显示标题（文本始终隐藏）",
     "singleH1Root": "多个主区块",
     "singleH1RootTooltip": "多个主区块 (G)\n开启: 将所有标题区块（#H1）组合为一个单一流。\n关闭: 将标题区块（#H1）分开为单独的流。",
     "settings": "⚙️ 视图"

@@ -32,7 +32,9 @@
     "levelTooltip": "Développez ou réduisez les nœuds jusqu'au niveau de profondeur sélectionné",
     "all": "Tout",
     "titlesOnly": "Voir uniquement les titres",
-    "titlesOnlyTooltip": "Afficher uniquement les titres (T)\nActivé : Affiche uniquement les titres dans le bloc.\nDésactivé : Affiche tout le contenu du bloc.",
+    "titlesOnlyTooltipAll": "Voir uniquement les titres (T)\nMode actuel : Tout afficher (Texte toujours visible)",
+    "titlesOnlyTooltipSelected": "Voir uniquement les titres (T)\nMode actuel : Auto-développer le sélectionné (Affiche le texte uniquement pour le bloc sélectionné)",
+    "titlesOnlyTooltipNone": "Voir uniquement les titres (T)\nMode actuel : Titres uniquement (Texte toujours masqué)",
     "singleH1Root": "Plusieurs blocs principaux",
     "singleH1RootTooltip": "Plusieurs blocs principaux (G)\nActivé : Regroupe tous les blocs de titres (#H1) en un seul flux.\nDésactivé : Sépare les blocs de titres (#H1) en flux individuels.",
     "settings": "⚙️ Vue"

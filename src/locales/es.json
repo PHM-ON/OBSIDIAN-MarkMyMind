@@ -32,7 +32,9 @@
     "levelTooltip": "Expande o reduce los nodos hasta el nivel de profundidad seleccionado",
     "all": "Todos",
     "titlesOnly": "Ver solo títulos",
-    "titlesOnlyTooltip": "Ver solo títulos (T)\nActivado: Muestra solo los títulos del bloque.\nDesactivado: Muestra todo el contenido del bloque.",
+    "titlesOnlyTooltipAll": "Ver solo títulos (T)\nModo actual: Mostrar todo (Texto siempre visible)",
+    "titlesOnlyTooltipSelected": "Ver solo títulos (T)\nModo actual: Auto-expandir en seleccionado (Muestra el texto solo del bloque seleccionado)",
+    "titlesOnlyTooltipNone": "Ver solo títulos (T)\nModo actual: Solo títulos (Texto siempre oculto)",
     "singleH1Root": "Múltiples bloques principales",
     "singleH1RootTooltip": "Múltiples bloques principales (G)\nActivado: Agrupa todos los bloques de títulos (#H1) en un solo flujo.\nDesactivado: Separa los bloques de títulos (#H1) en flujos individuales.",
     "settings": "⚙️ Vista"

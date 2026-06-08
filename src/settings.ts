@@ -14,6 +14,7 @@ export interface MarkMyMindSettings {
   syncDebounceMs: number;
   autoOpenForMd: boolean;
   showNoteText: boolean;
+  autoExpandSelected: boolean;
   fontSize: number;
   nodeWidth: number;
   colorMode: "level" | "branch" | "single";
@@ -38,6 +39,7 @@ export const DEFAULT_SETTINGS: MarkMyMindSettings = {
   syncDebounceMs: 500,
   autoOpenForMd: false,
   showNoteText: true,
+  autoExpandSelected: false,
   fontSize: 16,
   nodeWidth: 0,
   colorMode: "branch",
