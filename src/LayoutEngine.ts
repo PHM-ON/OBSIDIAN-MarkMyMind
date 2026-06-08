@@ -257,12 +257,24 @@ function layoutHorizontal(
 
   placeH(root, 0, 0, positions, subtreeHeights, fontSize, showNoteText, nodeWidth, maxNodeHeight, autoExpandSelected, selectedNodeIds);
 
-  let totalWidth = 0, totalHeight = 0;
-  for (const p of positions.values()) {
-    totalWidth = Math.max(totalWidth, p.x + p.width);
-    totalHeight = Math.max(totalHeight, p.y + p.height);
+  // Centraliza o root verticalmente em y = 0
+  const rootPos = positions.get(root.id);
+  if (rootPos) {
+    const offsetY = -(rootPos.y + rootPos.height / 2);
+    for (const pos of positions.values()) {
+      pos.y += offsetY;
+    }
   }
-  return { positions, totalWidth, totalHeight };
+
+  let minX = Infinity, maxX = -Infinity;
+  let minY = Infinity, maxY = -Infinity;
+  for (const p of positions.values()) {
+    minX = Math.min(minX, p.x);
+    maxX = Math.max(maxX, p.x + p.width);
+    minY = Math.min(minY, p.y);
+    maxY = Math.max(maxY, p.y + p.height);
+  }
+  return { positions, totalWidth: maxX - minX, totalHeight: maxY - minY };
 }
 
 function placeH(
@@ -321,12 +333,24 @@ function layoutVertical(
 
   placeV(root, 0, 0, positions, subtreeWidths, fontSize, showNoteText, nodeWidth, maxNodeHeight, autoExpandSelected, selectedNodeIds);
 
-  let totalWidth = 0, totalHeight = 0;
-  for (const p of positions.values()) {
-    totalWidth = Math.max(totalWidth, p.x + p.width);
-    totalHeight = Math.max(totalHeight, p.y + p.height);
+  // Centraliza o root horizontalmente em x = 0 para manter o root fixo
+  const rootPos = positions.get(root.id);
+  if (rootPos) {
+    const offsetX = -(rootPos.x + rootPos.width / 2);
+    for (const pos of positions.values()) {
+      pos.x += offsetX;
+    }
   }
-  return { positions, totalWidth, totalHeight };
+
+  let minX = Infinity, maxX = -Infinity;
+  let minY = Infinity, maxY = -Infinity;
+  for (const p of positions.values()) {
+    minX = Math.min(minX, p.x);
+    maxX = Math.max(maxX, p.x + p.width);
+    minY = Math.min(minY, p.y);
+    maxY = Math.max(maxY, p.y + p.height);
+  }
+  return { positions, totalWidth: maxX - minX, totalHeight: maxY - minY };
 }
 
 function placeV(
@@ -376,12 +400,24 @@ function layoutUp(
 
   placeUp(root, 0, 0, positions, subtreeWidths, fontSize, showNoteText, nodeWidth, maxNodeHeight, autoExpandSelected, selectedNodeIds);
 
-  let totalWidth = 0, totalHeight = 0;
-  for (const p of positions.values()) {
-    totalWidth = Math.max(totalWidth, p.x + p.width);
-    totalHeight = Math.max(totalHeight, p.y + p.height);
+  // Centraliza o root horizontalmente em x = 0 para manter o root fixo
+  const rootPos = positions.get(root.id);
+  if (rootPos) {
+    const offsetX = -(rootPos.x + rootPos.width / 2);
+    for (const pos of positions.values()) {
+      pos.x += offsetX;
+    }
   }
-  return { positions, totalWidth, totalHeight };
+
+  let minX = Infinity, maxX = -Infinity;
+  let minY = Infinity, maxY = -Infinity;
+  for (const p of positions.values()) {
+    minX = Math.min(minX, p.x);
+    maxX = Math.max(maxX, p.x + p.width);
+    minY = Math.min(minY, p.y);
+    maxY = Math.max(maxY, p.y + p.height);
+  }
+  return { positions, totalWidth: maxX - minX, totalHeight: maxY - minY };
 }
 
 function placeUp(
