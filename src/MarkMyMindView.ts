@@ -35,6 +35,9 @@ export class MarkMyMindView extends ItemView {
   private sidebarEl!: HTMLElement;
   private levelBtns: HTMLButtonElement[] = [];
   private splitBtn: HTMLButtonElement | null = null;
+  private selectedBtn: HTMLButtonElement | null = null;
+  private titlesBtn: HTMLButtonElement | null = null;
+  private singleH1RootBtn: HTMLButtonElement | null = null;
 
   saveSettings: () => Promise<void>;
   plugin: any;
@@ -206,14 +209,14 @@ export class MarkMyMindView extends ItemView {
     setTooltip(fitBtn, `${t("toolbar.focus")} ${t("toolbar.fit")}`);
     fitBtn.addEventListener("click", () => this.engine?.fitView());
 
-    const selectedBtn = toolbar.createEl("button", {
+    this.selectedBtn = toolbar.createEl("button", {
       cls: `markmymind-toolbar-btn ${this.settings.autoFocusOnSelect ? "active" : ""}`,
     });
-    setIcon(selectedBtn, "mouse-pointer");
-    setTooltip(selectedBtn, t("toolbar.selectedTooltip"));
-    selectedBtn.addEventListener("click", async () => {
+    setIcon(this.selectedBtn, "mouse-pointer");
+    setTooltip(this.selectedBtn, t("toolbar.selectedTooltip"));
+    this.selectedBtn.addEventListener("click", async () => {
       this.settings.autoFocusOnSelect = !this.settings.autoFocusOnSelect;
-      selectedBtn.classList.toggle("active", this.settings.autoFocusOnSelect);
+      this.selectedBtn?.classList.toggle("active", this.settings.autoFocusOnSelect);
       await this.saveSettings();
       if (this.settings.autoFocusOnSelect) {
         this.engine?.focusOnSelected();
@@ -223,15 +226,15 @@ export class MarkMyMindView extends ItemView {
     toolbar.createDiv({ cls: "markmymind-toolbar-sep" });
 
     // 3. Apenas Títulos (📑) - Acesso rápido e H1 Único como Raiz (🌳)
-    const titlesBtn = toolbar.createEl("button", {
+    this.titlesBtn = toolbar.createEl("button", {
       cls: `markmymind-toolbar-btn ${!this.settings.showNoteText ? "active" : ""}`,
     });
-    setIcon(titlesBtn, "type");
-    setTooltip(titlesBtn, t("toolbar.titlesOnlyTooltip"));
+    setIcon(this.titlesBtn, "type");
+    setTooltip(this.titlesBtn, t("toolbar.titlesOnlyTooltip"));
 
-    titlesBtn.addEventListener("click", async () => {
+    this.titlesBtn.addEventListener("click", async () => {
       this.settings.showNoteText = !this.settings.showNoteText;
-      titlesBtn.classList.toggle("active", !this.settings.showNoteText);
+      this.titlesBtn?.classList.toggle("active", !this.settings.showNoteText);
       await this.saveSettings();
       if (this.currentRoot) {
         this.engine?.render(this.currentRoot, this.currentLayout);
@@ -239,15 +242,15 @@ export class MarkMyMindView extends ItemView {
       }
     });
 
-    const singleH1RootBtn = toolbar.createEl("button", {
+    this.singleH1RootBtn = toolbar.createEl("button", {
       cls: `markmymind-toolbar-btn ${this.settings.singleH1Root ? "active" : ""}`,
     });
-    setIcon(singleH1RootBtn, "folder-tree");
-    setTooltip(singleH1RootBtn, t("toolbar.singleH1RootTooltip"));
+    setIcon(this.singleH1RootBtn, "folder-tree");
+    setTooltip(this.singleH1RootBtn, t("toolbar.singleH1RootTooltip"));
 
-    singleH1RootBtn.addEventListener("click", async () => {
+    this.singleH1RootBtn.addEventListener("click", async () => {
       this.settings.singleH1Root = !this.settings.singleH1Root;
-      singleH1RootBtn.classList.toggle("active", this.settings.singleH1Root);
+      this.singleH1RootBtn?.classList.toggle("active", this.settings.singleH1Root);
       await this.saveSettings();
       this.syncMdToMap(this.currentMdContent, false);
       this.engine?.fitView();
@@ -1433,6 +1436,13 @@ export class MarkMyMindView extends ItemView {
       const isArrow = e.key === "ArrowUp" || e.key === "ArrowDown" || e.key === "ArrowLeft" || e.key === "ArrowRight";
       const isLevelKey = /^[1-6]$/.test(e.key) && !e.ctrlKey && !e.metaKey && !e.altKey;
       const isSelectAll = (e.ctrlKey || e.metaKey) && e.key.toLowerCase() === "a";
+      const isResetKey = e.key.toLowerCase() === "r" && !e.ctrlKey && !e.metaKey && !e.altKey;
+      const isFitKey = e.key.toLowerCase() === "a" && !e.ctrlKey && !e.metaKey && !e.altKey;
+      const isFocusSelectedKey = e.key.toLowerCase() === "s" && !e.ctrlKey && !e.metaKey && !e.altKey;
+      const isTitlesOnlyKey = e.key.toLowerCase() === "t" && !e.ctrlKey && !e.metaKey && !e.altKey;
+      const isSingleH1RootKey = e.key.toLowerCase() === "g" && !e.ctrlKey && !e.metaKey && !e.altKey;
+      const isBackToEditorKey = e.key.toLowerCase() === "e" && !e.ctrlKey && !e.metaKey && !e.altKey;
+      const isSplitViewKey = (e.ctrlKey || e.metaKey) && e.key === "\\";
 
       if (isUndo) {
         e.preventDefault();
@@ -1443,6 +1453,31 @@ export class MarkMyMindView extends ItemView {
       } else if (isSelectAll) {
         e.preventDefault();
         this.engine?.selectAllNodes();
+      } else if (isResetKey) {
+        e.preventDefault();
+        this.engine?.centerView();
+      } else if (isFitKey) {
+        e.preventDefault();
+        this.engine?.fitView();
+      } else if (isFocusSelectedKey) {
+        e.preventDefault();
+        this.engine?.focusOnSelected();
+      } else if (isTitlesOnlyKey) {
+        e.preventDefault();
+        this.settings.showNoteText = !this.settings.showNoteText;
+        this.titlesBtn?.classList.toggle("active", !this.settings.showNoteText);
+        this.saveSettings();
+        if (this.currentRoot) {
+          this.engine?.render(this.currentRoot, this.currentLayout);
+          this.engine?.fitView();
+        }
+      } else if (isSingleH1RootKey) {
+        e.preventDefault();
+        this.settings.singleH1Root = !this.settings.singleH1Root;
+        this.singleH1RootBtn?.classList.toggle("active", this.settings.singleH1Root);
+        this.saveSettings();
+        this.syncMdToMap(this.currentMdContent, false);
+        this.engine?.fitView();
       } else if (isLevelKey) {
         e.preventDefault();
         const levelNum = parseInt(e.key);
@@ -1485,7 +1520,31 @@ export class MarkMyMindView extends ItemView {
             direction = "right";
             break;
         }
-        this.engine?.navigateWithKeyboard(direction, e.shiftKey);
+        if (e.shiftKey) {
+          if (direction === "right") this.setLayout("right");
+          else if (direction === "down") this.setLayout("down");
+          else if (direction === "up") this.setLayout("up");
+          else if (direction === "left") this.setLayout("bidirectional");
+        } else {
+          this.engine?.navigateWithKeyboard(direction, false);
+        }
+      } else if (isBackToEditorKey) {
+        e.preventDefault();
+        if (this.file) {
+          if (this.plugin) {
+            this.plugin.markdownModeFiles.add(this.file.path);
+          }
+          this.leaf.setViewState({
+            type: "markdown",
+            state: { file: this.file.path },
+            active: true,
+          });
+        }
+      } else if (isSplitViewKey) {
+        e.preventDefault();
+        if (this.file && this.plugin) {
+          this.plugin.toggleSplitView(this.file, this.leaf);
+        }
       }
     });
   }
