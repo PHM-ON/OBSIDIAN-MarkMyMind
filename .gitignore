@@ -1,0 +1,30 @@
+
+# Dependencies
+node_modules/
+
+# Build output
+main.js
+styles.css
+
+# Environment
+.env
+
+# Custom
+AG-Kit 2.0/
+docs/
+relatorio_temporario.md
+
+# OS files
+.DS_Store
+Thumbs.db
+ehthumbs.db
+*.swp
+*.swo
+
+# IDE
+.vscode/
+.idea/
+*.suo
+*.ntvs*
+*.njsproj
+*.sln

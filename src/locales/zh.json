@@ -1,0 +1,175 @@
+{
+  "commands": {
+    "openAs": "打开为 Mark My Mind（Markdown + 思维导图）",
+    "createNew": "新建思维导图（从零开始 .md）"
+  },
+  "ribbon": {
+    "tooltip": "Mark My Mind — 创建或打开导图"
+  },
+  "menu": {
+    "openAs": "🗺 打开为 Mark My Mind",
+    "createNew": "🗺 新建思维导图"
+  },
+  "notice": {
+    "created": "🗺 已创建新思维导图",
+    "undone": "已撤销",
+    "redone": "已重做",
+    "nothingToUndo": "没有可撤销的操作",
+    "nothingToRedo": "没有可重做的操作"
+  },
+  "toolbar": {
+    "backToEditor": "编辑器",
+    "splitView": "分屏视图\n左侧编辑器 / 右侧思维导图",
+    "focus": "聚焦:",
+    "reset": "重置",
+    "fit": "适应视图",
+    "selected": "已选",
+    "selectedTooltip": "聚焦: 已选\n始终聚焦在你选择的块上",
+    "undo": "撤销 (Ctrl+Z)",
+    "redo": "重做 (Ctrl+Y)",
+    "donate": "支持",
+    "level": "层级:",
+    "levelTooltip": "将节点展开或折叠到选定的深度级别",
+    "all": "全部",
+    "titlesOnly": "仅显示标题",
+    "titlesOnlyTooltip": "( 仅显示标题 )\n开启: 仅显示块中的标题。\n关闭: 显示块中的所有内容。",
+    "singleH1Root": "多个主区块",
+    "singleH1RootTooltip": "( H1 标题聚合器 )\n开启: 将所有标题块（#H1）合并为一个单一流程。\n关闭: 将标题块（#H1）分隔为独立流程。",
+    "settings": "⚙️ 视图"
+  },
+  "popover": {
+    "title": "⚙️ 视图设置",
+    "layoutColors": "布局颜色",
+    "layoutColorsTooltip": "选择地图布局以及颜色如何应用于节点",
+    "layout": "布局:",
+    "layoutTooltip": "定义节点的组织方式：水平、垂直或双向",
+    "colors": "颜色:",
+    "colorsTooltip": "定义节点的颜色样式：按层级、按分支或固定",
+    "lineForm": "线条形状",
+    "lineFormTooltip": "控制连接节点的线条形状和粗细",
+    "lines": "线条样式:",
+    "linesTooltip": "选择线条样式：曲线（平滑）、圆角（柔和角度）或直线",
+    "thickness": "线条粗细:",
+    "thicknessTooltip": "连接线条的粗细（像素）。默认值：5",
+    "blockSettings": "区块设置",
+    "blockSettingsTooltip": "调整文本大小、区块宽度和节点的最大高度",
+    "size": "字体大小:",
+    "sizeTooltip": "每个节点区块内使用的字体大小（像素）",
+    "width": "宽度:",
+    "widthTooltip": "每个节点区块的默认宽度。使用自动进行动态调整",
+    "maxHeight": "最大高度:",
+    "maxHeightTooltip": "节点区块的最大高度。使用无限制显示全部内容",
+    "alignment": "对齐：",
+    "alignmentTooltip": "区块内的文本对齐方式",
+    "restoreDefault": "恢复默认"
+  },
+  "alignment": {
+    "titleCenter": "标题居中",
+    "left": "左对齐",
+    "center": "居中对齐",
+    "right": "右对齐"
+  },
+  "layout": {
+    "right": "→ 右向 (Right)",
+    "down": "↓ 下向 (Down)",
+    "bidirectional": "↔ 双向",
+    "up": "↑ 上向 (Up)"
+  },
+  "lineStyle": {
+    "curved": "曲线",
+    "rounded": "圆角",
+    "straight": "直线"
+  },
+  "colorMode": {
+    "byLevel": "按层级",
+    "byBranch": "按分支",
+    "fixed": "固定色"
+  },
+  "width": {
+    "auto": "自动"
+  },
+  "height": {
+    "noLimit": "无限制"
+  },
+  "donate": {
+    "title": " Mark My Mind - 用心制作！ ❤️ ",
+    "intro": "你好，我是PHM，独立开发者，Mark My Mind的创建者！",
+    "body": "Mark My Mind花费了许多小时的辛勤工作和奉献，所以如果你对我的工作心存感激，请考虑支持我的开发，这样你就能鼓励我继续推进这个精彩的项目 ✨",
+    "pixHeader": "随时以任何金额支持我 ❤️",
+    "btn": "☕ 为项目贡献",
+    "footer": "用心和努力创造。感谢你的支持！✨",
+    "redirect": "正在跳转到支持页面...非常感谢！❤️"
+  },
+  "settings": {
+    "title": "⚙️ Mark My Mind — 设置",
+    "layout": {
+      "name": "📐 默认导图布局",
+      "desc": "定义节点在屏幕上的组织方式。",
+      "right": "→ 右向 (root on left)",
+      "down": "↓ 下向 (root on top)",
+      "bidirectional": "↔ 双向（左右展开）",
+      "up": "↑ 上向 (root on bottom)"
+    },
+    "lineForm": {
+      "name": "🧬 线条样式",
+      "desc": "定义连接导图节点的线条外观。默认：圆角。",
+      "curved": "🧬 曲线",
+      "rounded": "📐 圆角",
+      "straight": "📏 直线"
+    },
+    "syncSpeed": {
+      "name": "⚡ 同步速度 (ms)",
+      "desc": "输入后等待更新导图的时间。值越低 = 响应越快，但负荷越重。"
+    },
+    "autoOpen": {
+      "name": "📂 点击 .md 时自动打开",
+      "desc": "启用后，对 Markdown 文件使用 Mark My Mind 而非默认编辑器。"
+    },
+    "showNoteText": {
+      "name": "📝 在节点中显示段落文本",
+      "desc": "在节点中显示标题下方的段落作为注记。"
+    },
+    "maxHeight": {
+      "name": "📏 块最大高度（尺寸限制）",
+      "desc": "定义块注记允许的最大高度（像素）。使用 0 表示无限制。"
+    },
+    "fontSize": {
+      "name": "🔤 导图字体大小",
+      "desc": "定义思维导图块的基础字体大小（像素）。"
+    },
+    "nodeWidth": {
+      "name": "↔️ 块默认宽度",
+      "desc": "定义块的默认宽度（像素）。选择 0 表示自动调整（默认 350px）。最小 200px，最大 800px。"
+    },
+    "lineSize": {
+      "name": "📏 线条粗细",
+      "desc": "定义连接导图节点的线条粗细（像素）。默认：5。范围：1 到 10。"
+    },
+    "colorMode": {
+      "name": "🎨 导图配色模式",
+      "desc": "定义颜色如何应用于思维导图块。",
+      "byLevel": "按层级（深度）",
+      "byBranch": "按分支（分支继承）",
+      "single": "统一颜色（单一 H2 颜色）"
+    },
+    "colors": {
+      "title": "🎨 按层级的节点颜色",
+      "h1": "🔴 H1（主标题）",
+      "h2": "🟡 H2（副标题）",
+      "h3": "🔵 H3（章节）",
+      "h4": "🟢 H4 / 列表"
+    },
+    "autoFocusOnSelect": {
+      "name": "🎯 自动聚焦选中节点",
+      "desc": "启用后，地图将始终居中并聚焦在你选择的节点上。"
+    },
+    "singleH1Root": {
+      "name": "🌳 多个主区块",
+      "desc": "多个主区块\n（拥有多个独立区块或仅一个「H1」区块）"
+    },
+    "alignment": {
+      "name": "📐 默认文本对齐方式",
+      "desc": "定义地图区块内文本的对齐方式。"
+    }
+  }
+}

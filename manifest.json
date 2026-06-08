@@ -1,0 +1,10 @@
+{
+  "id": "mark-my-mind",
+  "name": "Mark My Mind",
+  "version": "1.0.0",
+  "minAppVersion": "1.0.0",
+  "description": "Integra edição Markdown com Mapa Mental interativo na mesma tela. Converta headings em nós visuais e vice-versa, com canvas rico e bidirecional.",
+  "author": "Mark My Mind",
+  "authorUrl": "https://github.com/mark-my-mind",
+  "isDesktopOnly": false
+}

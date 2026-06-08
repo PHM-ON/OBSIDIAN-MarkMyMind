@@ -1,0 +1,175 @@
+{
+  "commands": {
+    "openAs": "Mark My Mindとして開く（Markdown + マインドマップ）",
+    "createNew": "新しいマインドマップを作成（.mdをゼロから）"
+  },
+  "ribbon": {
+    "tooltip": "Mark My Mind — マップを作成または開く"
+  },
+  "menu": {
+    "openAs": "🗺 Mark My Mindとして開く",
+    "createNew": "🗺 新しいマインドマップを作成"
+  },
+  "notice": {
+    "created": "🗺 新しいマインドマップが作成されました",
+    "undone": "元に戻しました",
+    "redone": "やり直しました",
+    "nothingToUndo": "元に戻すものはありません",
+    "nothingToRedo": "やり直すものはありません"
+  },
+  "toolbar": {
+    "backToEditor": "エディター",
+    "splitView": "分割ビュー\n左側にエディター / 右側にマインドマップ",
+    "focus": "フォーカス:",
+    "reset": "リセット",
+    "fit": "表示に合わせる",
+    "selected": "選択済み",
+    "selectedTooltip": "フォーカス: 選択済み\n選択したブロックに常にフォーカスします",
+    "undo": "元に戻す (Ctrl+Z)",
+    "redo": "やり直す (Ctrl+Y)",
+    "donate": "サポート",
+    "level": "レベル:",
+    "levelTooltip": "選択した深度レベルまでノードを展開または折りたたみます",
+    "all": "すべて",
+    "titlesOnly": "タイトルのみ表示",
+    "titlesOnlyTooltip": "( タイトルのみ表示 )\nオン: ブロック内のタイトルのみ表示します。\nオフ: ブロック内のすべてのコンテンツを表示します。",
+    "singleH1Root": "複数のメインブロック",
+    "singleH1RootTooltip": "( H1タイトル集約 )\nオン: すべてのタイトルブロック（#H1）を1つのフローにまとめます。\nオフ: タイトルブロック（#H1）を個別のフローに分けます。",
+    "settings": "⚙️ 表示"
+  },
+  "popover": {
+    "title": "⚙️ 表示設定",
+    "layoutColors": "レイアウトカラー",
+    "layoutColorsTooltip": "マップのレイアウトとノードへの色の適用方法を選択します",
+    "layout": "レイアウト:",
+    "layoutTooltip": "ノードの整理方法を定義します：水平、垂直、または双方向",
+    "colors": "カラー:",
+    "colorsTooltip": "ノードの色スタイルを定義します：レベル別、ブランチ別、または固定",
+    "lineForm": "線の形状",
+    "lineFormTooltip": "ノードを接続する線の形状と太さを制御します",
+    "lines": "線のスタイル:",
+    "linesTooltip": "線のスタイルを選択：曲線（滑らか）、角丸（ソフトな角度）、または直線",
+    "thickness": "線の太さ:",
+    "thicknessTooltip": "接続線の太さ（ピクセル）。デフォルト：5",
+    "blockSettings": "ブロック設定",
+    "blockSettingsTooltip": "テキストサイズ、ブロック幅、ノードの最大高さを調整します",
+    "size": "文字サイズ:",
+    "sizeTooltip": "各ノードブロック内で使用されるフォントサイズ（ピクセル）",
+    "width": "幅:",
+    "widthTooltip": "各ノードブロックのデフォルト幅。自動調整にはAutoを使用",
+    "maxHeight": "最大高さ:",
+    "maxHeightTooltip": "ノードブロックの最大高さ。制限なしの場合はNo Limitを使用",
+    "alignment": "配置：",
+    "alignmentTooltip": "ブロック内のテキスト配置",
+    "restoreDefault": "デフォルトに戻す"
+  },
+  "alignment": {
+    "titleCenter": "タイトル中央揃え",
+    "left": "左揃え",
+    "center": "中央揃え",
+    "right": "右揃え"
+  },
+  "layout": {
+    "right": "→ 右向 (Right)",
+    "down": "↓ 下向 (Down)",
+    "bidirectional": "↔ 双方向",
+    "up": "↑ 上向 (Up)"
+  },
+  "lineStyle": {
+    "curved": "曲線",
+    "rounded": "角丸",
+    "straight": "直線"
+  },
+  "colorMode": {
+    "byLevel": "レベル別",
+    "byBranch": "ブランチ別",
+    "fixed": "固定"
+  },
+  "width": {
+    "auto": "自動"
+  },
+  "height": {
+    "noLimit": "制限なし"
+  },
+  "donate": {
+    "title": " Mark My Mind - 愛を込めて作りました！ ❤️ ",
+    "intro": "こんにちは、私はPHMです。Mark My Mindの独立した開発者兼クリエイターです！",
+    "body": "Mark My Mindは多くの時間のハードワークと献身を必要としました。もし私の仕事に感謝しているなら、開発を支援することを検討してください。そうすれば、この素晴らしいプロジェクトを前進し続ける励みになります ✨",
+    "pixHeader": "いつでも好きな金額でサポートしてください ❤️",
+    "btn": "☕ プロジェクトに貢献する",
+    "footer": "心を込めて作りました。ご支援ありがとうございます！✨",
+    "redirect": "サポートページへリダイレクト中... ありがとうございます！❤️"
+  },
+  "settings": {
+    "title": "⚙️ Mark My Mind — 設定",
+    "layout": {
+      "name": "📐 マップのデフォルトレイアウト",
+      "desc": "ノードの画面上の配置方法を定義します。",
+      "right": "→ 右向 (root on left)",
+      "down": "↓ 下向 (root on top)",
+      "bidirectional": "↔ 双方向（左右に展開）",
+      "up": "↑ 上向 (root on bottom)"
+    },
+    "lineForm": {
+      "name": "🧬 線のスタイル",
+      "desc": "マップノードを結ぶ線の見た目を定義します。デフォルト: 角丸。",
+      "curved": "🧬 エルゴノミック（曲線）",
+      "rounded": "📐 角丸（滑らかな直角）",
+      "straight": "📏 直線（対角線）"
+    },
+    "syncSpeed": {
+      "name": "⚡ 同期速度 (ms)",
+      "desc": "入力後にマップを更新するまでの待機時間。値が小さいほどレスポンスが良くなりますが、負荷が増えます。"
+    },
+    "autoOpen": {
+      "name": "📂 .mdクリック時に自動で開く",
+      "desc": "有効にすると、Markdownファイルをデフォルトエディターの代わりにMark My Mindで開きます。"
+    },
+    "showNoteText": {
+      "name": "📝 ノードに段落テキストを表示",
+      "desc": "見出し下の段落をノードのメモとして表示します。"
+    },
+    "maxHeight": {
+      "name": "📏 ブロックの最大高さ（サイズ制限）",
+      "desc": "ブロックのメモに許可される最大高さ（ピクセル）を定義します。0で制限なし。"
+    },
+    "fontSize": {
+      "name": "🔤 マップのフォントサイズ",
+      "desc": "マインドマップブロックのベースフォントサイズ（ピクセル）を定義します。"
+    },
+    "nodeWidth": {
+      "name": "↔️ ブロックのデフォルト幅",
+      "desc": "ブロックのデフォルト幅（ピクセル）を定義します。0で自動調整（デフォルト350px）。最小200px、最大800px。"
+    },
+    "lineSize": {
+      "name": "📏 線の太さ",
+      "desc": "ノードを結ぶ線の太さ（ピクセル）を定義します。デフォルト: 5。範囲: 1～10。"
+    },
+    "colorMode": {
+      "name": "🎨 マップのカラーモード",
+      "desc": "マインドマップブロックへの色の適用方法を定義します。",
+      "byLevel": "レベル別（深さ）",
+      "byBranch": "ブランチ別（ブランチ継承）",
+      "single": "単一カラー（H2単色）"
+    },
+    "colors": {
+      "title": "🎨 レベル別ノードカラー",
+      "h1": "🔴 H1（メインタイトル）",
+      "h2": "🟡 H2（サブタイトル）",
+      "h3": "🔵 H3（セクション）",
+      "h4": "🟢 H4 / リスト"
+    },
+    "autoFocusOnSelect": {
+      "name": "🎯 選択したノードに自動フォーカス",
+      "desc": "有効にすると、選択したノードにマップが常に中央表示されフォーカスします。"
+    },
+    "singleH1Root": {
+      "name": "🌳 複数のメインブロック",
+      "desc": "複数のメインブロック\n（複数の個別ブロックまたは単一の「H1」ブロックのみ）"
+    },
+    "alignment": {
+      "name": "📐 デフォルトのテキスト配置",
+      "desc": "マップブロック内のテキストの配置方法を定義します。"
+    }
+  }
+}

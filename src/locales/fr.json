@@ -1,0 +1,175 @@
+{
+  "commands": {
+    "openAs": "Ouvrir comme Mark My Mind (Markdown + MindMap)",
+    "createNew": "Créer une nouvelle carte mentale (.md depuis zéro)"
+  },
+  "ribbon": {
+    "tooltip": "Mark My Mind — Créer ou ouvrir une carte"
+  },
+  "menu": {
+    "openAs": "🗺 Ouvrir comme Mark My Mind",
+    "createNew": "🗺 Créer une nouvelle carte mentale"
+  },
+  "notice": {
+    "created": "🗺 Nouvelle carte mentale créée",
+    "undone": "Annulé",
+    "redone": "Rétabli",
+    "nothingToUndo": "Rien à annuler",
+    "nothingToRedo": "Rien à rétablir"
+  },
+  "toolbar": {
+    "backToEditor": "Éditeur",
+    "splitView": "Vue Fractionnée\nÉditeur à gauche / MindMap à droite",
+    "focus": "Focus :",
+    "reset": "Réinitialiser",
+    "fit": "Ajuster la vue",
+    "selected": "Sélectionné",
+    "selectedTooltip": "Focus : Sélectionné\nSe concentre toujours sur le bloc que vous sélectionnez",
+    "undo": "Annuler (Ctrl+Z)",
+    "redo": "Rétablir (Ctrl+Y)",
+    "donate": "Soutenir",
+    "level": "Niveau :",
+    "levelTooltip": "Développez ou réduisez les nœuds jusqu'au niveau de profondeur sélectionné",
+    "all": "Tout",
+    "titlesOnly": "Voir uniquement les titres",
+    "titlesOnlyTooltip": "( Voir uniquement les titres )\nActivé : Affiche uniquement les titres dans le bloc.\nDésactivé : Affiche tout le contenu du bloc.",
+    "singleH1Root": "Plusieurs blocs principaux",
+    "singleH1RootTooltip": "( Regroupeur de titres H1 )\nActivé : Regroupe tous les blocs de titres (#H1) en un seul flux.\nDésactivé : Sépare les blocs de titres (#H1) en flux individuels.",
+    "settings": "⚙️ Vue"
+  },
+  "popover": {
+    "title": "⚙️ Paramètres d'affichage",
+    "layoutColors": "Couleurs de disposition",
+    "layoutColorsTooltip": "Choisissez la disposition de la carte et comment les couleurs sont appliquées aux nœuds",
+    "layout": "Disposition :",
+    "layoutTooltip": "Définit comment les nœuds sont organisés : Horizontal, Vertical ou Bidirectionnel",
+    "colors": "Couleurs :",
+    "colorsTooltip": "Définit le style de couleur des nœuds : par niveau, par branche ou fixe",
+    "lineForm": "Forme des lignes",
+    "lineFormTooltip": "Contrôle la forme et l'épaisseur des lignes reliant les nœuds",
+    "lines": "Forme des lignes :",
+    "linesTooltip": "Choisissez le style de ligne : courbe (lisse), arrondi (angle doux) ou droit",
+    "thickness": "Épaisseur :",
+    "thicknessTooltip": "Épaisseur en pixels des lignes de connexion. Par défaut : 5",
+    "blockSettings": "Paramètres des blocs",
+    "blockSettingsTooltip": "Ajustez la taille du texte, la largeur et la hauteur maximale des nœuds",
+    "size": "Taille du texte :",
+    "sizeTooltip": "Taille de police en pixels utilisée dans chaque bloc de nœud",
+    "width": "Largeur :",
+    "widthTooltip": "Largeur par défaut de chaque bloc de nœud. Utilisez Auto pour un dimensionnement dynamique",
+    "maxHeight": "Hauteur max. :",
+    "maxHeightTooltip": "Hauteur maximale des blocs de nœud. Utilisez Sans limite pour afficher tout le contenu",
+    "alignment": "Alignement :",
+    "alignmentTooltip": "Alignement du texte dans le bloc",
+    "restoreDefault": "Restaurer par défaut"
+  },
+  "alignment": {
+    "titleCenter": "Centrer le titre",
+    "left": "Gauche",
+    "center": "Centré",
+    "right": "Droite"
+  },
+  "layout": {
+    "right": "→ Right (Droite)",
+    "down": "↓ Down (Bas)",
+    "bidirectional": "↔ Bidirectionnel",
+    "up": "↑ Up (Haut)"
+  },
+  "lineStyle": {
+    "curved": "Courbé",
+    "rounded": "Arrondi",
+    "straight": "Droit"
+  },
+  "colorMode": {
+    "byLevel": "Par niveau",
+    "byBranch": "Par branche",
+    "fixed": "Fixe"
+  },
+  "width": {
+    "auto": "Auto"
+  },
+  "height": {
+    "noLimit": "Sans limite"
+  },
+  "donate": {
+    "title": " Mark My Mind - Fait avec Amour ! ❤️ ",
+    "intro": "Salut, je suis PHM, développeur indépendant et créateur de Mark My Mind !",
+    "body": "Mark My Mind a demandé de nombreuses heures de travail acharné et de dévouement, alors si tu te sens reconnaissant pour mon travail, envisage de me soutenir dans le développement, pour m'encourager à continuer d'avancer avec ce merveilleux projet ✨",
+    "pixHeader": "Soutenez-moi avec n'importe quel montant quand vous voulez ❤️",
+    "btn": "☕ Contribuer au projet",
+    "footer": "Créé avec beaucoup de soin et d'efforts. Merci pour votre soutien ! ✨",
+    "redirect": "Redirection vers la page de soutien... Merci beaucoup ! ❤️"
+  },
+  "settings": {
+    "title": "⚙️ Mark My Mind — Paramètres",
+    "layout": {
+      "name": "📐 Disposition par défaut de la carte",
+      "desc": "Définit comment les nœuds sont organisés à l'écran.",
+      "right": "→ Right (racine à gauche)",
+      "down": "↓ Down (racine en haut)",
+      "bidirectional": "↔ Bidirectionnel (gauche et droite)",
+      "up": "↑ Up (racine en bas)"
+    },
+    "lineForm": {
+      "name": "🧬 Forme des lignes",
+      "desc": "Définit l'apparence des lignes reliant les nœuds. Par défaut : Arrondi.",
+      "curved": "🧬 Ergonomique (Courbes)",
+      "rounded": "📐 Arrondi (angle droit doux)",
+      "straight": "📏 Droit (ligne diagonale)"
+    },
+    "syncSpeed": {
+      "name": "⚡ Vitesse de synchronisation (ms)",
+      "desc": "Temps d'attente après la saisie avant de mettre à jour la carte. Valeurs plus basses = plus réactif, mais plus lourd."
+    },
+    "autoOpen": {
+      "name": "📂 Ouvrir automatiquement en cliquant sur .md",
+      "desc": "Si activé, ouvre Mark My Mind au lieu de l'éditeur par défaut pour les fichiers Markdown."
+    },
+    "showNoteText": {
+      "name": "📝 Afficher le texte de paragraphe dans les nœuds",
+      "desc": "Affiche les paragraphes sous les titres comme note dans le nœud."
+    },
+    "maxHeight": {
+      "name": "📏 Hauteur maximale des blocs (Limite de taille)",
+      "desc": "Définit la hauteur maximale autorisée pour les notes des blocs (en pixels). Utilisez 0 pour Sans limite."
+    },
+    "fontSize": {
+      "name": "🔤 Taille de police de la carte",
+      "desc": "Définit la taille de police de base pour les blocs de la carte mentale (en pixels)."
+    },
+    "nodeWidth": {
+      "name": "↔️ Largeur par défaut des blocs",
+      "desc": "Définit la largeur par défaut des blocs (en pixels). Choisissez 0 pour l'ajustement automatique (350px par défaut). Min 200px, max 800px."
+    },
+    "lineSize": {
+      "name": "📏 Épaisseur des lignes",
+      "desc": "Définit l'épaisseur (en pixels) des lignes reliant les nœuds. Par défaut : 5. Limites : 1 à 10."
+    },
+    "colorMode": {
+      "name": "🎨 Mode couleur de la carte",
+      "desc": "Définit comment les couleurs sont appliquées aux blocs de la carte mentale.",
+      "byLevel": "Par niveau (profondeur)",
+      "byBranch": "Par branche (héritage de branche)",
+      "single": "Couleur uniforme (couleur unique H2)"
+    },
+    "colors": {
+      "title": "🎨 Couleurs des nœuds par niveau",
+      "h1": "🔴 H1 (Titre principal)",
+      "h2": "🟡 H2 (Sous-titre)",
+      "h3": "🔵 H3 (Section)",
+      "h4": "🟢 H4 / Listes"
+    },
+    "autoFocusOnSelect": {
+      "name": "🎯 Mise au point automatique sur le nœud sélectionné",
+      "desc": "Si activé, la carte se centrera et se concentrera toujours sur le nœud que vous sélectionnez."
+    },
+    "singleH1Root": {
+      "name": "🌳 Plusieurs blocs principaux",
+      "desc": "Plusieurs blocs principaux\n(Avoir plusieurs blocs séparés ou un seul bloc \"H1\")"
+    },
+    "alignment": {
+      "name": "📐 Alignement de texte par défaut",
+      "desc": "Définit comment le texte est aligné dans les blocs de la carte."
+    }
+  }
+}

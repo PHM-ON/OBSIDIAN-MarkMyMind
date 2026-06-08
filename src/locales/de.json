@@ -1,0 +1,175 @@
+{
+  "commands": {
+    "openAs": "Als Mark My Mind öffnen (Markdown + MindMap)",
+    "createNew": "Neue Mindmap erstellen (.md von Grund auf)"
+  },
+  "ribbon": {
+    "tooltip": "Mark My Mind — Karte erstellen oder öffnen"
+  },
+  "menu": {
+    "openAs": "🗺 Als Mark My Mind öffnen",
+    "createNew": "🗺 Neue Mindmap erstellen"
+  },
+  "notice": {
+    "created": "🗺 Neue Mindmap erstellt",
+    "undone": "Rückgängig gemacht",
+    "redone": "Wiederholt",
+    "nothingToUndo": "Nichts rückgängig zu machen",
+    "nothingToRedo": "Nichts zu wiederholen"
+  },
+  "toolbar": {
+    "backToEditor": "Editor",
+    "splitView": "Geteilte Ansicht\nEditor links / MindMap rechts",
+    "focus": "Fokus:",
+    "reset": "Zurücksetzen",
+    "fit": "Ansicht anpassen",
+    "selected": "Ausgewählt",
+    "selectedTooltip": "Fokus: Ausgewählt\nFokussiert immer auf den Block, den du auswählst",
+    "undo": "Rückgängig (Strg+Z)",
+    "redo": "Wiederholen (Strg+Y)",
+    "donate": "Unterstützen",
+    "level": "Ebene:",
+    "levelTooltip": "Erweitere oder reduziere die Knoten bis zur ausgewählten Tiefe",
+    "all": "Alle",
+    "titlesOnly": "Nur Titel anzeigen",
+    "titlesOnlyTooltip": "( Nur Titel anzeigen )\nEin: Zeigt nur die Titel im Block an.\nAus: Zeigt den gesamten Inhalt des Blocks an.",
+    "singleH1Root": "Mehrere Hauptblöcke",
+    "singleH1RootTooltip": "( H1-Titel-Gruppierer )\nEin: Gruppiert alle Titelblöcke (#H1) in einem einzigen Fluss.\nAus: Trennt Titelblöcke (#H1) in einzelne Flüsse.",
+    "settings": "⚙️ Ansicht"
+  },
+  "popover": {
+    "title": "⚙️ Anzeigeeinstellungen",
+    "layoutColors": "Layout-Farben",
+    "layoutColorsTooltip": "Wähle das Kartenlayout und wie Farben auf Knoten angewendet werden",
+    "layout": "Layout:",
+    "layoutTooltip": "Definiert, wie Knoten organisiert werden: Horizontal, Vertikal oder Bidirektional",
+    "colors": "Farben:",
+    "colorsTooltip": "Definiert den Farbstil der Knoten: nach Ebene, nach Ast oder fest",
+    "lineForm": "Linienform",
+    "lineFormTooltip": "Steuert die Form und Dicke der Verbindungslinien",
+    "lines": "Linienform:",
+    "linesTooltip": "Wähle den Linienstil: geschwungen (weich), abgerundet (weicher Winkel) oder gerade",
+    "thickness": "Linienstärke:",
+    "thicknessTooltip": "Dicke der Verbindungslinien in Pixeln. Standard: 5",
+    "blockSettings": "Blockeinstellungen",
+    "blockSettingsTooltip": "Passe Textgröße, Blockbreite und maximale Höhe der Knoten an",
+    "size": "Schriftgröße:",
+    "sizeTooltip": "Schriftgröße in Pixeln, die in jedem Knotenblock verwendet wird",
+    "width": "Breite:",
+    "widthTooltip": "Standardbreite jedes Knotenblocks. Verwende Auto für dynamische Größe",
+    "maxHeight": "Max. Höhe:",
+    "maxHeightTooltip": "Maximale Höhe der Knotenblöcke. Verwende Kein Limit, um den gesamten Inhalt anzuzeigen",
+    "alignment": "Ausrichtung:",
+    "alignmentTooltip": "Textausrichtung innerhalb des Blocks",
+    "restoreDefault": "Standard wiederherstellen"
+  },
+  "alignment": {
+    "titleCenter": "Titel zentrieren",
+    "left": "Links",
+    "center": "Zentriert",
+    "right": "Rechts"
+  },
+  "layout": {
+    "right": "→ Right (Rechts)",
+    "down": "↓ Down (Unten)",
+    "bidirectional": "↔ Bidirektional",
+    "up": "↑ Up (Oben)"
+  },
+  "lineStyle": {
+    "curved": "Geschwungen",
+    "rounded": "Abgerundet",
+    "straight": "Gerade"
+  },
+  "colorMode": {
+    "byLevel": "Nach Ebene",
+    "byBranch": "Nach Ast",
+    "fixed": "Fest"
+  },
+  "width": {
+    "auto": "Auto"
+  },
+  "height": {
+    "noLimit": "Kein Limit"
+  },
+  "donate": {
+    "title": " Mark My Mind - Mit Liebe gemacht! ❤️ ",
+    "intro": "Hallo, ich bin PHM, unabhängiger Entwickler und Schöpfer von Mark My Mind!",
+    "body": "Mark My Mind erforderte viele Stunden harter Arbeit und Hingabe. Wenn du für meine Arbeit dankbar bist, erwäge mich bei der Entwicklung zu unterstützen, damit du mich ermutigst, mit diesem wunderbaren Projekt fortzufahren ✨",
+    "pixHeader": "Unterstütze mich mit jedem Betrag, wann immer du möchtest ❤️",
+    "btn": "☕ Zum Projekt beitragen",
+    "footer": "Mit viel Sorgfalt und Mühe erstellt. Danke für deine Unterstützung! ✨",
+    "redirect": "Weiterleitung zur Unterstützungsseite... Vielen Dank! ❤️"
+  },
+  "settings": {
+    "title": "⚙️ Mark My Mind — Einstellungen",
+    "layout": {
+      "name": "📐 Standard-Kartenlayout",
+      "desc": "Legt fest, wie Knoten auf dem Bildschirm angeordnet werden.",
+      "right": "→ Right (Wurzel links)",
+      "down": "↓ Down (Wurzel oben)",
+      "bidirectional": "↔ Bidirektional (links und rechts)",
+      "up": "↑ Up (Wurzel unten)"
+    },
+    "lineForm": {
+      "name": "🧬 Linienform",
+      "desc": "Definiert das Aussehen der Verbindungslinien. Standard: Abgerundet.",
+      "curved": "🧬 Ergonomisch (Kurven)",
+      "rounded": "📐 Abgerundet (sanfter rechter Winkel)",
+      "straight": "📏 Gerade (Diagonale)"
+    },
+    "syncSpeed": {
+      "name": "⚡ Synchronisierungsgeschwindigkeit (ms)",
+      "desc": "Wartezeit nach dem Tippen vor dem Aktualisieren der Karte. Kleinere Werte = reaktionsschneller, aber aufwändiger."
+    },
+    "autoOpen": {
+      "name": "📂 Beim Klicken auf .md automatisch öffnen",
+      "desc": "Falls aktiviert, öffnet Mark My Mind anstelle des Standard-Editors für Markdown-Dateien."
+    },
+    "showNoteText": {
+      "name": "📝 Absatztext in Knoten anzeigen",
+      "desc": "Zeigt Absätze unter Überschriften als Notiz im Knoten an."
+    },
+    "maxHeight": {
+      "name": "📏 Maximale Blockhöhe (Größenlimit)",
+      "desc": "Definiert die maximale Höhe für Blocknotizen (in Pixeln). 0 = kein Limit."
+    },
+    "fontSize": {
+      "name": "🔤 Kartenschriftgröße",
+      "desc": "Definiert die Basisschriftgröße für Mindmap-Blöcke (in Pixeln)."
+    },
+    "nodeWidth": {
+      "name": "↔️ Standard-Blockbreite",
+      "desc": "Definiert die Standard-Blockbreite (in Pixeln). 0 = automatisch (Standard 350px). Min 200px, max 800px."
+    },
+    "lineSize": {
+      "name": "📏 Linienstärke",
+      "desc": "Definiert die Stärke der Verbindungslinien (in Pixeln). Standard: 5. Bereich: 1 bis 10."
+    },
+    "colorMode": {
+      "name": "🎨 Kartenfarbmodus",
+      "desc": "Definiert, wie Farben auf Mindmap-Blöcke angewendet werden.",
+      "byLevel": "Nach Ebene (Tiefe)",
+      "byBranch": "Nach Ast (Astvererbung)",
+      "single": "Einheitliche Farbe (einzelne H2-Farbe)"
+    },
+    "colors": {
+      "title": "🎨 Knotenfarben nach Ebene",
+      "h1": "🔴 H1 (Haupttitel)",
+      "h2": "🟡 H2 (Untertitel)",
+      "h3": "🔵 H3 (Abschnitt)",
+      "h4": "🟢 H4 / Listen"
+    },
+    "autoFocusOnSelect": {
+      "name": "🎯 Auto-Fokus auf ausgewähltem Knoten",
+      "desc": "Wenn aktiviert, zentriert und fokussiert die Karte immer auf den ausgewählten Knoten."
+    },
+    "singleH1Root": {
+      "name": "🌳 Mehrere Hauptblöcke",
+      "desc": "Mehrere Hauptblöcke\n(Habe mehrere separate Blöcke oder nur einen einzigen \"H1\"-Block)"
+    },
+    "alignment": {
+      "name": "📐 Standard-Textausrichtung",
+      "desc": "Definiert, wie Text in den Kartenblöcken ausgerichtet wird."
+    }
+  }
+}
