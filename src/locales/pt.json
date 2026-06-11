@@ -106,6 +106,9 @@
   },
   "settings": {
     "title": "⚙️ Mark My Mind — Configurações",
+    "groupGeneral": "⚙️ Geral / Comportamento",
+    "groupLayout": "📐 Layout & Linhas",
+    "groupBlocks": "📦 Estilo dos Blocos",
     "layout": {
       "name": "📐 Layout padrão do mapa",
       "desc": "Define como os nós são organizados na tela.",
@@ -115,7 +118,7 @@
       "up": "↑ Up (raiz na base)"
     },
     "lineForm": {
-      "name": "🧬 Line Form",
+      "name": "🧬 Formato da Linha (Line Form)",
       "desc": "Define o visual das linhas que ligam os nós do mapa. Padrão: Arredondado.",
       "curved": "🧬 Ergonômico (Curvas)",
       "rounded": "📐 Arredondado (Ângulo reto suave)",
@@ -146,7 +149,7 @@
       "desc": "Define a largura padrão dos blocos (em pixels). Escolha 0 para ajuste automático (padrão 350px). Mínimo 200px, máximo 800px."
     },
     "lineSize": {
-      "name": "📏 Line Size",
+      "name": "📏 Espessura da Linha (Line Size)",
       "desc": "Define a espessura (em pixels) das linhas que ligam os nós do mapa. Padrão: 5. Limites: 1 a 10."
     },
     "colorMode": {

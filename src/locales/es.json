@@ -104,6 +104,9 @@
   },
   "settings": {
     "title": "⚙️ Mark My Mind — Configuración",
+    "groupGeneral": "⚙️ Configuración General",
+    "groupLayout": "📐 Diseño y Líneas",
+    "groupBlocks": "📦 Estilo de Bloques",
     "layout": {
       "name": "📐 Diseño predeterminado del mapa",
       "desc": "Define cómo se organizan los nodos en la pantalla.",

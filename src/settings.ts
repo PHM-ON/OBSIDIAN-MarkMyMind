@@ -76,7 +76,58 @@ export class MarkMyMindSettingTab extends PluginSettingTab {
 
     containerEl.createEl("h2", { text: t("settings.title") });
 
-    // ── Layout padrão ──
+    // ─── GRUPO 1: GERAL ───
+    containerEl.createEl("h3", { text: t("settings.groupGeneral") });
+
+    // 1º. Auto-abrir (autoOpenForMd)
+    new Setting(containerEl)
+      .setName(t("settings.autoOpen.name"))
+      .setDesc(t("settings.autoOpen.desc"))
+      .addToggle((toggle) =>
+        toggle
+          .setValue(this.plugin.settings.autoOpenForMd)
+          .onChange(async (value) => {
+            this.plugin.settings.autoOpenForMd = value;
+            await this.plugin.saveSettings();
+          })
+      );
+
+    // 2º. Debounce de sincronização (syncDebounceMs)
+    new Setting(containerEl)
+      .setName(t("settings.syncSpeed.name"))
+      .setDesc(t("settings.syncSpeed.desc"))
+      .addDropdown((drop) =>
+        drop
+          .addOption("200", "200ms")
+          .addOption("500", "500ms")
+          .addOption("800", "800ms")
+          .addOption("1000", "1000ms (1s)")
+          .addOption("1500", "1500ms")
+          .addOption("2000", "2000ms (2s)")
+          .setValue(String(this.plugin.settings.syncDebounceMs))
+          .onChange(async (value) => {
+            this.plugin.settings.syncDebounceMs = parseInt(value);
+            await this.plugin.saveSettings();
+          })
+      );
+
+    // 3. Focar automaticamente no selecionado (Auto Focus)
+    new Setting(containerEl)
+      .setName(t("settings.autoFocusOnSelect.name"))
+      .setDesc(t("settings.autoFocusOnSelect.desc"))
+      .addToggle((toggle) =>
+        toggle
+          .setValue(this.plugin.settings.autoFocusOnSelect)
+          .onChange(async (value) => {
+            this.plugin.settings.autoFocusOnSelect = value;
+            await this.plugin.saveSettings();
+          })
+      );
+
+    // ─── GRUPO 2: LAYOUT & LINHAS ───
+    containerEl.createEl("h3", { text: t("settings.groupLayout") });
+
+    // Layout padrão
     new Setting(containerEl)
       .setName(t("settings.layout.name"))
       .setDesc(t("settings.layout.desc"))
@@ -93,7 +144,7 @@ export class MarkMyMindSettingTab extends PluginSettingTab {
           })
       );
 
-    // ── Estilo de linhas de conexão (Line Form) ──
+    // Estilo de linhas de conexão (Line Form)
     new Setting(containerEl)
       .setName(t("settings.lineForm.name"))
       .setDesc(t("settings.lineForm.desc"))
@@ -109,61 +160,22 @@ export class MarkMyMindSettingTab extends PluginSettingTab {
           })
       );
 
-    // ── Debounce de sincronização ──
+    // Espessura das linhas (Line Size)
     new Setting(containerEl)
-      .setName(t("settings.syncSpeed.name"))
-      .setDesc(t("settings.syncSpeed.desc"))
-      .addSlider((slider) =>
-        slider
-          .setLimits(200, 2000, 100)
-          .setValue(this.plugin.settings.syncDebounceMs)
-          .setDynamicTooltip()
-          .onChange(async (value) => {
-            this.plugin.settings.syncDebounceMs = value;
-            await this.plugin.saveSettings();
-          })
-      );
+      .setName(t("settings.lineSize.name"))
+      .setDesc(t("settings.lineSize.desc"))
+      .addDropdown((drop) => {
+        for (let i = 1; i <= 10; i++) {
+          drop.addOption(String(i), `${i}px`);
+        }
+        drop.setValue(String(this.plugin.settings.connectionWidth !== undefined ? this.plugin.settings.connectionWidth : 5))
+            .onChange(async (value) => {
+              this.plugin.settings.connectionWidth = parseInt(value);
+              await this.plugin.saveSettings();
+            });
+      });
 
-    // ── Auto-abrir ──
-    new Setting(containerEl)
-      .setName(t("settings.autoOpen.name"))
-      .setDesc(t("settings.autoOpen.desc"))
-      .addToggle((toggle) =>
-        toggle
-          .setValue(this.plugin.settings.autoOpenForMd)
-          .onChange(async (value) => {
-            this.plugin.settings.autoOpenForMd = value;
-            await this.plugin.saveSettings();
-          })
-      );
-
-    // ── Mostrar nota dos headings ──
-    new Setting(containerEl)
-      .setName(t("settings.showNoteText.name"))
-      .setDesc(t("settings.showNoteText.desc"))
-      .addToggle((toggle) =>
-        toggle
-          .setValue(this.plugin.settings.showNoteText)
-          .onChange(async (value) => {
-            this.plugin.settings.showNoteText = value;
-            await this.plugin.saveSettings();
-          })
-      );
-
-    // ── Focar automaticamente no selecionado (Auto Focus) ──
-    new Setting(containerEl)
-      .setName(t("settings.autoFocusOnSelect.name"))
-      .setDesc(t("settings.autoFocusOnSelect.desc"))
-      .addToggle((toggle) =>
-        toggle
-          .setValue(this.plugin.settings.autoFocusOnSelect)
-          .onChange(async (value) => {
-            this.plugin.settings.autoFocusOnSelect = value;
-            await this.plugin.saveSettings();
-          })
-      );
-
-    // ── H1 como Nó Único ──
+    // H1 como Nó Único (Múltiplos Blocos Principais)
     new Setting(containerEl)
       .setName(t("settings.singleH1Root.name"))
       .setDesc(t("settings.singleH1Root.desc"))
@@ -176,7 +188,57 @@ export class MarkMyMindSettingTab extends PluginSettingTab {
           })
       );
 
-    // ── Alinhamento do texto nos blocos ──
+    // ─── GRUPO 3: ESTILO DOS BLOCOS ───
+    containerEl.createEl("h3", { text: t("settings.groupBlocks") });
+
+    // Tamanho da fonte
+    new Setting(containerEl)
+      .setName(t("settings.fontSize.name"))
+      .setDesc(t("settings.fontSize.desc"))
+      .addDropdown((drop) => {
+        for (let i = 10; i <= 24; i++) {
+          drop.addOption(String(i), `${i}px`);
+        }
+        drop.setValue(String(this.plugin.settings.fontSize || 12))
+            .onChange(async (value) => {
+              this.plugin.settings.fontSize = parseInt(value);
+              await this.plugin.saveSettings();
+            });
+      });
+
+    // Largura do bloco
+    new Setting(containerEl)
+      .setName(t("settings.nodeWidth.name"))
+      .setDesc(t("settings.nodeWidth.desc"))
+      .addDropdown((drop) => {
+        drop.addOption("0", t("width.auto"));
+        for (let w = 200; w <= 800; w += 50) {
+          drop.addOption(String(w), `${w}px`);
+        }
+        drop.setValue(String(this.plugin.settings.nodeWidth !== undefined ? this.plugin.settings.nodeWidth : 0))
+            .onChange(async (value) => {
+              this.plugin.settings.nodeWidth = parseInt(value);
+              await this.plugin.saveSettings();
+            });
+      });
+
+    // Limitar tamanho do bloco (Max Height Limit)
+    new Setting(containerEl)
+      .setName(t("settings.maxHeight.name"))
+      .setDesc(t("settings.maxHeight.desc"))
+      .addDropdown((drop) => {
+        drop.addOption("0", t("height.noLimit"));
+        for (let h = 100; h <= 800; h += 50) {
+          drop.addOption(String(h), `${h}px`);
+        }
+        drop.setValue(String(this.plugin.settings.maxNodeHeight || 0))
+            .onChange(async (value) => {
+              this.plugin.settings.maxNodeHeight = parseInt(value);
+              await this.plugin.saveSettings();
+            });
+      });
+
+    // Alinhamento do texto nos blocos
     new Setting(containerEl)
       .setName(t("settings.alignment.name"))
       .setDesc(t("settings.alignment.desc"))
@@ -193,72 +255,23 @@ export class MarkMyMindSettingTab extends PluginSettingTab {
           })
       );
 
-    // ── Limitar tamanho do bloco (Max Height Limit) ──
+    // Mostrar nota dos headings
     new Setting(containerEl)
-      .setName(t("settings.maxHeight.name"))
-      .setDesc(t("settings.maxHeight.desc"))
-      .addSlider((slider) =>
-        slider
-          .setLimits(0, 800, 50)
-          .setValue(this.plugin.settings.maxNodeHeight || 0)
-          .setDynamicTooltip()
+      .setName(t("settings.showNoteText.name"))
+      .setDesc(t("settings.showNoteText.desc"))
+      .addToggle((toggle) =>
+        toggle
+          .setValue(this.plugin.settings.showNoteText)
           .onChange(async (value) => {
-            this.plugin.settings.maxNodeHeight = value;
+            this.plugin.settings.showNoteText = value;
             await this.plugin.saveSettings();
           })
       );
 
-    // ── Tamanho da fonte ──
-    new Setting(containerEl)
-      .setName(t("settings.fontSize.name"))
-      .setDesc(t("settings.fontSize.desc"))
-      .addSlider((slider) =>
-        slider
-          .setLimits(10, 24, 1)
-          .setValue(this.plugin.settings.fontSize || 12)
-          .setDynamicTooltip()
-          .onChange(async (value) => {
-            this.plugin.settings.fontSize = value;
-            await this.plugin.saveSettings();
-          })
-      );
+    // ─── GRUPO 4: CORES ───
+    containerEl.createEl("h3", { text: t("settings.colors.title") });
 
-    // ── Largura do bloco ──
-    new Setting(containerEl)
-      .setName(t("settings.nodeWidth.name"))
-      .setDesc(t("settings.nodeWidth.desc"))
-      .addSlider((slider) =>
-        slider
-          .setLimits(0, 800, 50)
-          .setValue(this.plugin.settings.nodeWidth !== undefined ? this.plugin.settings.nodeWidth : 0)
-          .setDynamicTooltip()
-          .onChange(async (value) => {
-            let finalValue = value;
-            if (value > 0 && value < 200) {
-              finalValue = 200;
-              slider.setValue(200);
-            }
-            this.plugin.settings.nodeWidth = finalValue;
-            await this.plugin.saveSettings();
-          })
-      );
-
-    // ── Espessura das linhas (Line Size) ──
-    new Setting(containerEl)
-      .setName(t("settings.lineSize.name"))
-      .setDesc(t("settings.lineSize.desc"))
-      .addSlider((slider) =>
-        slider
-          .setLimits(1, 10, 1)
-          .setValue(this.plugin.settings.connectionWidth !== undefined ? this.plugin.settings.connectionWidth : 5)
-          .setDynamicTooltip()
-          .onChange(async (value) => {
-            this.plugin.settings.connectionWidth = value;
-            await this.plugin.saveSettings();
-          })
-      );
-
-    // ── Modo de cores ──
+    // Modo de cores
     new Setting(containerEl)
       .setName(t("settings.colorMode.name"))
       .setDesc(t("settings.colorMode.desc"))
@@ -273,9 +286,6 @@ export class MarkMyMindSettingTab extends PluginSettingTab {
             await this.plugin.saveSettings();
           })
       );
-
-    // ── Cores por nível ──
-    containerEl.createEl("h3", { text: t("settings.colors.title") });
 
     const colorSettings: { key: keyof MarkMyMindSettings; name: string }[] = [
       { key: "colorH1", name: t("settings.colors.h1") },

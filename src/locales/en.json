@@ -106,6 +106,9 @@
   },
   "settings": {
     "title": "⚙️ Mark My Mind — Settings",
+    "groupGeneral": "⚙️ General Settings",
+    "groupLayout": "📐 Layout & Lines",
+    "groupBlocks": "📦 Block Style",
     "layout": {
       "name": "📐 Default map layout",
       "desc": "Defines how nodes are organized on the screen.",

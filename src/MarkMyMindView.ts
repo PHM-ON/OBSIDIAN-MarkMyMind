@@ -1427,6 +1427,7 @@ export class MarkMyMindView extends ItemView {
       const isDelete = e.key === "Delete" || e.key === "Backspace";
       const isAddChild = e.key === "+" || e.key === "=";
       const isCollapse = e.key === "-" || e.key === "_";
+      const isSpace = e.key === " " && !e.ctrlKey && !e.metaKey && !e.altKey;
       const isArrow = e.key === "ArrowUp" || e.key === "ArrowDown" || e.key === "ArrowLeft" || e.key === "ArrowRight";
       const isLevelKey = /^[1-6]$/.test(e.key) && !e.ctrlKey && !e.metaKey && !e.altKey;
       const isSelectAll = (e.ctrlKey || e.metaKey) && e.key.toLowerCase() === "a";
@@ -1490,6 +1491,11 @@ export class MarkMyMindView extends ItemView {
         if (this.engine?.selectedNodeId) {
           e.preventDefault();
           this.onMapNodeCollapse(this.engine.selectedNodeId);
+        }
+      } else if (isSpace) {
+        if (this.engine?.selectedNodeId) {
+          e.preventDefault();
+          this.engine.editSelectedNode();
         }
       } else if (isArrow) {
         e.preventDefault();

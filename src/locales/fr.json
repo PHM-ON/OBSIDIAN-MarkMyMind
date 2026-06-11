@@ -104,6 +104,9 @@
   },
   "settings": {
     "title": "⚙️ Mark My Mind — Paramètres",
+    "groupGeneral": "⚙️ Paramètres généraux",
+    "groupLayout": "📐 Disposition & Lignes",
+    "groupBlocks": "📦 Style des blocs",
     "layout": {
       "name": "📐 Disposition par défaut de la carte",
       "desc": "Définit comment les nœuds sont organisés à l'écran.",

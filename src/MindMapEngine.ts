@@ -1329,6 +1329,28 @@ export class MindMapEngine {
     }
   }
 
+  editSelectedNode(): void {
+    if (!this.selectedNodeId || !this.currentRoot) return;
+    const fontSize = this.settings.fontSize || 12;
+    const { positions } = calculateLayout(
+      this.currentRoot,
+      this.currentLayout,
+      fontSize,
+      this.settings.showNoteText,
+      this.settings.nodeWidth,
+      this.settings.maxNodeHeight,
+      this.settings.autoExpandSelected,
+      this.selectedNodeIds
+    );
+    const pos = positions.get(this.selectedNodeId);
+    if (!pos) return;
+    const node = findNodeById(this.currentRoot, this.selectedNodeId);
+    if (node) {
+      this.openNodeEditor(node, pos);
+    }
+  }
+
+
   navigateWithKeyboard(direction: "up" | "down" | "left" | "right", expandSelection = false): void {
     if (!this.selectedNodeId || !this.currentRoot) return;
 

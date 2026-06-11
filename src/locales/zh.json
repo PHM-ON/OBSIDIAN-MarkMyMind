@@ -104,6 +104,9 @@
   },
   "settings": {
     "title": "⚙️ Mark My Mind — 设置",
+    "groupGeneral": "⚙️ 常规设置",
+    "groupLayout": "📐 布局与线条",
+    "groupBlocks": "📦 区块样式",
     "layout": {
       "name": "📐 默认导图布局",
       "desc": "定义节点在屏幕上的组织方式。",

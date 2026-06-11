@@ -104,6 +104,9 @@
   },
   "settings": {
     "title": "⚙️ Mark My Mind — Einstellungen",
+    "groupGeneral": "⚙️ Allgemeine Einstellungen",
+    "groupLayout": "📐 Layout & Linien",
+    "groupBlocks": "📦 Blockstil",
     "layout": {
       "name": "📐 Standard-Kartenlayout",
       "desc": "Legt fest, wie Knoten auf dem Bildschirm angeordnet werden.",

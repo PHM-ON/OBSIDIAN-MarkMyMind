@@ -104,6 +104,9 @@
   },
   "settings": {
     "title": "⚙️ Mark My Mind — 設定",
+    "groupGeneral": "⚙️ 一般設定",
+    "groupLayout": "📐 レイアウトと線",
+    "groupBlocks": "📦 ブロックのスタイル",
     "layout": {
       "name": "📐 マップのデフォルトレイアウト",
       "desc": "ノードの画面上の配置方法を定義します。",
