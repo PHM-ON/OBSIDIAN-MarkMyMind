@@ -703,9 +703,14 @@ export class MindMapEngine {
   ): void {
     if (node.level < 0) return; // não deleta raiz
 
+    const isSelected = this.selectedNodeIds.has(node.id);
+    const initialOpacity = isSelected ? "1" : "0";
+    const initialPointerEvents = isSelected ? "auto" : "none";
+
     const delG = g.append("g")
       .attr("class", "mm-delete-btn")
-      .style("opacity", "0")
+      .style("opacity", initialOpacity)
+      .style("pointer-events", initialPointerEvents)
       .style("cursor", "pointer")
       .on("click", (event) => {
         event.stopPropagation();
@@ -742,14 +747,21 @@ export class MindMapEngine {
       d3.select(this).selectAll(".mm-smart-btn")
         .transition().duration(150).style("opacity", "1");
       d3.select(this).select(".mm-delete-btn")
-        .transition().duration(150).style("opacity", "1");
+        .transition().duration(150)
+        .style("opacity", "1")
+        .style("pointer-events", "auto");
     }).on("mouseleave", function () {
       const isSelected = self.selectedNodeIds.has(node.id);
       d3.select(this).select(".mm-node-rect")
         .transition().duration(120)
         .attr("stroke-width", isSelected ? 3.5 : (isRoot ? 2.5 : 1.8));
+      
+      const restoreDeleteOpacity = isSelected ? "1" : "0";
+      const restoreDeletePointerEvents = isSelected ? "auto" : "none";
       d3.select(this).select(".mm-delete-btn")
-        .transition().duration(150).style("opacity", "0");
+        .transition().duration(150)
+        .style("opacity", restoreDeleteOpacity)
+        .style("pointer-events", restoreDeletePointerEvents);
       // Smart button: volta ao estado inicial baseado no conteúdo do nó
       const hasChildren = node.children.length > 0;
       const isCollapsed = node.collapsed;
