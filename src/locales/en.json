@@ -1,0 +1,182 @@
+{
+  "commands": {
+    "openAs": "Open as Mark My Mind (Markdown + MindMap)",
+    "createNew": "Create new mind map (.md from scratch)"
+  },
+  "ribbon": {
+    "tooltip": "Mark My Mind — Create or Open Map"
+  },
+  "menu": {
+    "openAs": "🗺 Open as Mark My Mind",
+    "createNew": "🗺 Create new Mind Map"
+  },
+  "notice": {
+    "created": "🗺 New mind map created",
+    "undone": "Undone",
+    "redone": "Redone",
+    "nothingToUndo": "Nothing to undo",
+    "nothingToRedo": "Nothing to redo"
+  },
+  "toolbar": {
+    "backToEditor": "Back to Editor (E)",
+    "splitView": "Split View (Ctrl+\\)\nEditor left / MindMap right",
+    "focus": "Focus:",
+    "reset": "Reset (R)",
+    "fit": "All (A)",
+    "selected": "Selected",
+    "selectedTooltip": "Focus: Selected (S)\nAlways focuses on the block you select",
+    "undo": "Undo (Ctrl+Z)",
+    "redo": "Redo (Ctrl+Y)",
+    "donate": "Support",
+    "level": "Level",
+    "levelTooltip": "Expand or collapse the nodes down to the selected depth level",
+    "all": "All",
+    "titlesOnly": "View Titles Only",
+    "titlesOnlyTooltipAll": "View Titles Only (T)\nCurrent mode: Show all (Text always visible)",
+    "titlesOnlyTooltipSelected": "View Titles Only (T)\nCurrent mode: Auto-expand selected (Shows text only for the selected block)",
+    "titlesOnlyTooltipNone": "View Titles Only (T)\nCurrent mode: Titles only (Text always hidden)",
+    "singleH1Root": "Multiple Main Blocks",
+    "singleH1RootTooltip": "H1 Title Aggregator (G)\nOn: Groups all title blocks (#H1) into a single flow.\nOff: Separates title blocks (#H1) into individual flows.",
+    "settings": "⚙️ View"
+  },
+  "popover": {
+    "title": "⚙️ View Settings",
+    "layoutColors": "Layout Colors",
+    "layoutColorsTooltip": "Choose the map layout and how colors are applied to nodes",
+    "layout": "Layout",
+    "layoutTooltip": "Defines how nodes are organized: Horizontal, Vertical or Bidirectional",
+    "colors": "Colors",
+    "colorsTooltip": "Defines the color style of nodes: by depth level, by branch, or fixed",
+    "lineForm": "Line Form",
+    "lineFormTooltip": "Controls the shape and thickness of the lines connecting nodes",
+    "lines": "Line Shape",
+    "linesTooltip": "Choose the line style: curved (smooth), rounded (soft angle) or straight",
+    "thickness": "Line Size",
+    "thicknessTooltip": "Thickness in pixels of the connecting lines. Default: 5",
+    "blockSettings": "Block Settings",
+    "blockSettingsTooltip": "Adjust text size, block width and maximum height of nodes",
+    "size": "Text Size",
+    "sizeTooltip": "Font size in pixels used inside each node block",
+    "width": "Width",
+    "widthTooltip": "Default width of each node block. Use Auto for dynamic sizing",
+    "maxHeight": "Height",
+    "maxHeightTooltip": "Maximum height of node blocks. Use No Limit to show full content",
+    "alignment": "Alignment",
+    "alignmentTooltip": "Text alignment within the block",
+    "restoreDefault": "Restore default"
+  },
+
+  "alignment": {
+    "titleCenter": "Title Center",
+    "left": "Left",
+    "center": "Center",
+    "right": "Right"
+  },
+
+  "layout": {
+    "right": "→ Right",
+    "down": "↓ Down",
+    "bidirectional": "↔ Bi-directional",
+    "up": "↑ Up"
+  },
+  "lineStyle": {
+    "curved": "Curved",
+    "rounded": "Rounded",
+    "straight": "Straight"
+  },
+  "colorMode": {
+    "byLevel": "By Level",
+    "byBranch": "By Branch",
+    "fixed": "Fixed"
+  },
+  "width": {
+    "auto": "Auto"
+  },
+  "height": {
+    "noLimit": "No Limit"
+  },
+  "donate": {
+    "title": " Mark My Mind - Made with Love! ❤️ ",
+    "intro": "Hi, I'm PHM, independent developer and creator of Mark My Mind!",
+    "body": "Mark My Mind took many hours of hard work and dedication, so if you feel grateful for my work, consider supporting me in development, so you encourage me to continue moving forward with this wonderful project ✨",
+    "pixHeader": "Support me with any amount whenever you want ❤️",
+    "btn": "☕ Contribute to the Project",
+    "footer": "Created with a lot of care and effort. Thank you for your support! ✨",
+    "redirect": "Redirecting to support page... Thank you so much! ❤️"
+  },
+  "settings": {
+    "title": "⚙️ Mark My Mind — Settings",
+    "groupGeneral": "⚙️ General Settings",
+    "groupLayout": "📐 Layout & Lines",
+    "groupBlocks": "📦 Block Style",
+    "layout": {
+      "name": "📐 Default map layout",
+      "desc": "Defines how nodes are organized on the screen.",
+      "right": "→ Right (root on left)",
+      "down": "↓ Down (root on top)",
+      "bidirectional": "↔ Bi-directional (left and right)",
+      "up": "↑ Up (root on bottom)"
+    },
+    "lineForm": {
+      "name": "🧬 Line Form",
+      "desc": "Defines the appearance of lines connecting map nodes. Default: Rounded.",
+      "curved": "🧬 Ergonomic (Curves)",
+      "rounded": "📐 Rounded (soft right angle)",
+      "straight": "📏 Straight (diagonal line)"
+    },
+    "syncSpeed": {
+      "name": "⚡ Sync speed (ms)",
+      "desc": "Wait time after typing before updating the map. Lower values = more responsive, but heavier."
+    },
+    "autoOpen": {
+      "name": "📂 Auto-open when clicking .md",
+      "desc": "If enabled, opens Mark My Mind instead of the default editor for Markdown files."
+    },
+    "showNoteText": {
+      "name": "📝 Show paragraph text in nodes",
+      "desc": "Displays paragraphs below headings as a note in the node."
+    },
+    "maxHeight": {
+      "name": "📏 Maximum block height (Size Limit)",
+      "desc": "Defines the maximum allowed height for block notes (in pixels). Use 0 for No Limit."
+    },
+    "fontSize": {
+      "name": "🔤 Map font size",
+      "desc": "Defines the base font size for mind map blocks (in pixels)."
+    },
+    "nodeWidth": {
+      "name": "↔️ Default block width",
+      "desc": "Defines the default block width (in pixels). Choose 0 for auto adjust (default 350px). Min 200px, max 800px."
+    },
+    "lineSize": {
+      "name": "📏 Line Size",
+      "desc": "Defines the thickness (in pixels) of the lines connecting map nodes. Default: 5. Limits: 1 to 10."
+    },
+    "colorMode": {
+      "name": "🎨 Map color mode",
+      "desc": "Defines how colors are applied to mind map blocks.",
+      "byLevel": "By Level (depth)",
+      "byBranch": "By Branch (branch inheritance)",
+      "single": "Uniform Color (single H2 color)"
+    },
+    "colors": {
+      "title": "🎨 Node colors by level",
+      "h1": "🔴 H1 (Main title)",
+      "h2": "🟡 H2 (Subtitle)",
+      "h3": "🔵 H3 (Section)",
+      "h4": "🟢 H4 / Lists"
+    },
+    "autoFocusOnSelect": {
+      "name": "🎯 Auto focus on selected node",
+      "desc": "If enabled, the mind map will always center and focus the view on the node you select."
+    },
+    "singleH1Root": {
+      "name": "🌳 Multiple Main Blocks",
+      "desc": "Multiple Main Blocks\n(Have several separate blocks or Just a single \"H1\" block)"
+    },
+    "alignment": {
+      "name": "📐 Default text alignment",
+      "desc": "Defines how text is aligned inside the map blocks."
+    }
+  }
+}

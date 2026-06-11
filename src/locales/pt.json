@@ -1,0 +1,182 @@
+{
+  "commands": {
+    "openAs": "Abrir como Mark My Mind (Markdown + MindMap)",
+    "createNew": "Criar novo mapa mental (.md do zero)"
+  },
+  "ribbon": {
+    "tooltip": "Mark My Mind — Criar ou Abrir Mapa"
+  },
+  "menu": {
+    "openAs": "🗺 Abrir como Mark My Mind",
+    "createNew": "🗺 Criar novo Mapa Mental"
+  },
+  "notice": {
+    "created": "🗺 Novo mapa mental criado",
+    "undone": "Desfeito",
+    "redone": "Refeito",
+    "nothingToUndo": "Nada para desfazer",
+    "nothingToRedo": "Nada para refazer"
+  },
+  "toolbar": {
+    "backToEditor": "Voltar ao Editor (E)",
+    "splitView": "Dividir Tela (Ctrl+\\)\nEditor à esquerda / MindMap à direita",
+    "focus": "Foco:",
+    "reset": "Reset (R)",
+    "fit": "Tudo (A)",
+    "selected": "Selecionado",
+    "selectedTooltip": "Foco: Selecionado (S)\nSempre foca no bloco que você selecionar",
+    "undo": "Desfazer (Ctrl+Z)",
+    "redo": "Refazer (Ctrl+Y)",
+    "donate": "Apoiar",
+    "level": "Nível",
+    "levelTooltip": "Expanda ou recolha os nós até o nível de profundidade selecionado",
+    "all": "Todos",
+    "titlesOnly": "Ver Só Títulos",
+    "titlesOnlyTooltipAll": "Ver Só Títulos (T)\nModo atual: Mostrar tudo (Texto sempre visível)",
+    "titlesOnlyTooltipSelected": "Ver Só Títulos (T)\nModo atual: Auto-expandir no selecionado (Mostra o texto apenas do bloco selecionado)",
+    "titlesOnlyTooltipNone": "Ver Só Títulos (T)\nModo atual: Apenas títulos (Texto sempre oculto)",
+    "singleH1Root": "Múltiplos Blocos Principais",
+    "singleH1RootTooltip": "Múltiplos Blocos Principais (G)\nLigado: Agrupa todos os blocos de títulos (#H1) em um único fluxo.\nDesligado: Separa os blocos de títulos (#H1) em fluxos individuais.",
+    "settings": "⚙️ Visualização"
+  },
+  "popover": {
+    "title": "⚙️ Ajustes de Visualização",
+    "layoutColors": "Layout Colors",
+    "layoutColorsTooltip": "Escolha o layout do mapa e como as cores são aplicadas nos nós",
+    "layout": "Layout",
+    "layoutTooltip": "Define como os nós são organizados: Horizontal, Vertical ou Bidirecional",
+    "colors": "Cores",
+    "colorsTooltip": "Define o estilo de cores dos nós: por nível de profundidade, por ramo, ou fixo",
+    "lineForm": "Line Form",
+    "lineFormTooltip": "Controla o formato e a espessura das linhas que conectam os nós",
+    "lines": "Estilo da Linha",
+    "linesTooltip": "Escolha o visual das linhas: curvo (suave), arredondado (ângulo suave) ou reto",
+    "thickness": "Espessura",
+    "thicknessTooltip": "Espessura em pixels das linhas de conexão. Padrão: 5",
+    "blockSettings": "Block Settings",
+    "blockSettingsTooltip": "Ajuste o tamanho do texto, largura e altura máxima dos blocos",
+    "size": "Text Size",
+    "sizeTooltip": "Tamanho da fonte em pixels usada dentro de cada bloco",
+    "width": "Largura",
+    "widthTooltip": "Largura padrão de cada bloco. Use Auto para ajuste dinâmico",
+    "maxHeight": "Altura",
+    "maxHeightTooltip": "Altura máxima dos blocos. Use Sem Limite para exibir o conteúdo completo",
+    "alignment": "Alinhamento",
+    "alignmentTooltip": "Alinhamento do texto no bloco",
+    "restoreDefault": "Restaurar padrão"
+  },
+
+  "alignment": {
+    "titleCenter": "Centralizar Título",
+    "left": "Esquerda",
+    "center": "Centralizado",
+    "right": "Direita"
+  },
+
+  "layout": {
+    "right": "→ Right",
+    "down": "↓ Down",
+    "bidirectional": "↔ Bi-direcional",
+    "up": "↑ Up"
+  },
+  "lineStyle": {
+    "curved": "Curvo",
+    "rounded": "Arredondado",
+    "straight": "Reto"
+  },
+  "colorMode": {
+    "byLevel": "Por Nível",
+    "byBranch": "Por Ramo",
+    "fixed": "Fixa"
+  },
+  "width": {
+    "auto": "Auto"
+  },
+  "height": {
+    "noLimit": "Sem Limite"
+  },
+  "donate": {
+    "title": " Mark My Mind - Feito com Amor! ❤️ ",
+    "intro": "Oi sou o PHM desenvolvedor independente e criador do Mark My Mind!",
+    "body": "O Mark My Mind exigiu muitas horas de trabalho duro e dedicação, então se você se sentir agradecido pelo meu trabalho, considere me apoiar no desenvolvimento, assim você me incentivar a continuar em frente com esse projeto maravilhoso ✨",
+    "pixHeader": "Me apoie com qualquer valor sempre que quiser ❤️",
+    "btn": "☕ Contribuir com o Projeto",
+    "footer": "Criado com muito carinho e esforço. Obrigado por apoiar! ✨",
+    "redirect": "Redirecionando para a página de apoio... Muito obrigado! ❤️"
+  },
+  "settings": {
+    "title": "⚙️ Mark My Mind — Configurações",
+    "groupGeneral": "⚙️ Geral / Comportamento",
+    "groupLayout": "📐 Layout & Linhas",
+    "groupBlocks": "📦 Estilo dos Blocos",
+    "layout": {
+      "name": "📐 Layout padrão do mapa",
+      "desc": "Define como os nós são organizados na tela.",
+      "right": "→ Right (raiz à esquerda)",
+      "down": "↓ Down (raiz no topo)",
+      "bidirectional": "↔ Bi-direcional (esquerda e direita)",
+      "up": "↑ Up (raiz na base)"
+    },
+    "lineForm": {
+      "name": "🧬 Formato da Linha (Line Form)",
+      "desc": "Define o visual das linhas que ligam os nós do mapa. Padrão: Arredondado.",
+      "curved": "🧬 Ergonômico (Curvas)",
+      "rounded": "📐 Arredondado (Ângulo reto suave)",
+      "straight": "📏 Reto (Linha reta diagonal)"
+    },
+    "syncSpeed": {
+      "name": "⚡ Velocidade de sincronização (ms)",
+      "desc": "Tempo de espera após digitar antes de atualizar o mapa. Valores menores = mais responsivo, mas mais pesado."
+    },
+    "autoOpen": {
+      "name": "📂 Abrir automaticamente ao clicar em .md",
+      "desc": "Se ativado, abre o Mark My Mind ao invés do editor padrão para arquivos Markdown."
+    },
+    "showNoteText": {
+      "name": "📝 Mostrar texto de parágrafo nos nós",
+      "desc": "Exibe parágrafos abaixo dos headings como nota no nó."
+    },
+    "maxHeight": {
+      "name": "📏 Altura máxima dos blocos (Size Limit)",
+      "desc": "Define a altura máxima permitida para as notas dos blocos (em pixels). Use 0 para Sem Limite."
+    },
+    "fontSize": {
+      "name": "🔤 Tamanho da fonte do mapa",
+      "desc": "Define o tamanho base da fonte para os blocos do mapa mental (em pixels)."
+    },
+    "nodeWidth": {
+      "name": "↔️ Largura padrão dos blocos",
+      "desc": "Define a largura padrão dos blocos (em pixels). Escolha 0 para ajuste automático (padrão 350px). Mínimo 200px, máximo 800px."
+    },
+    "lineSize": {
+      "name": "📏 Espessura da Linha (Line Size)",
+      "desc": "Define a espessura (em pixels) das linhas que ligam os nós do mapa. Padrão: 5. Limites: 1 a 10."
+    },
+    "colorMode": {
+      "name": "🎨 Modo de cores do mapa",
+      "desc": "Define como as cores são aplicadas aos blocos do mapa mental.",
+      "byLevel": "Por Nível (profundidade)",
+      "byBranch": "Por Ramificação (herança do ramo)",
+      "single": "Cor Uniforme (cor única H2)"
+    },
+    "colors": {
+      "title": "🎨 Cores dos nós por nível",
+      "h1": "🔴 H1 (Título principal)",
+      "h2": "🟡 H2 (Subtítulo)",
+      "h3": "🔵 H3 (Seção)",
+      "h4": "🟢 H4 / Listas"
+    },
+    "autoFocusOnSelect": {
+      "name": "🎯 Focar automaticamente no nó selecionado",
+      "desc": "Se ativado, o mapa mental sempre centralizará e focará a visualização no nó que você selecionar."
+    },
+    "singleH1Root": {
+      "name": "🌳 Múltiplos Blocos Principais",
+      "desc": "Múltiplos Blocos Principais\n(Tenha vários blocos separados ou Apenas um bloco único \"H1\")"
+    },
+    "alignment": {
+      "name": "📐 Alinhamento do texto nos blocos",
+      "desc": "Define como o texto é alinhado dentro dos blocos do mapa."
+    }
+  }
+}
