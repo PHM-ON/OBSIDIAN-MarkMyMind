@@ -1,10 +1,10 @@
 {
   "id": "mark-my-mind",
-  "name": "Mark My Mind",
+  "name": "MarkMyMind - Mindmap",
   "version": "1.0.0",
   "minAppVersion": "1.0.0",
-  "description": "Integra edição Markdown com Mapa Mental interativo na mesma tela. Converta headings em nós visuais e vice-versa, com canvas rico e bidirecional.",
-  "author": "Mark My Mind",
-  "authorUrl": "https://github.com/mark-my-mind",
+  "description": "Turns your Markdown notes into beautiful Mind Map with real-time sync.",
+  "author": "PHM",
+  "authorUrl": "https://github.com/PHM-ON/OBSIDIAN-MarkMyMind",
   "isDesktopOnly": false
 }

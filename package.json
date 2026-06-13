@@ -1,7 +1,7 @@
 {
-  "name": "mark-my-mind",
+  "name": "MarkMyMind - Mindmap",
   "version": "1.0.0",
-  "description": "Plugin Obsidian: Markdown + MindMap integrados com canvas interativo",
+  "description": "Turns your Markdown notes into beautiful Mind Map with real-time sync.",
   "main": "main.js",
   "scripts": {
     "dev": "node esbuild.config.mjs",
@@ -13,7 +13,7 @@
     "mindmap",
     "markdown"
   ],
-  "author": "Mark My Mind",
+  "author": "PHM",
   "license": "MIT",
   "devDependencies": {
     "@types/d3": "^7.4.0",
