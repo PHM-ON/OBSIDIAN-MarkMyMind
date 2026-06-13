@@ -74,10 +74,10 @@ export class MarkMyMindSettingTab extends PluginSettingTab {
     const { containerEl } = this;
     containerEl.empty();
 
-    containerEl.createEl("h2", { text: t("settings.title") });
+    new Setting(containerEl).setName(t("settings.title")).setHeading();
 
     // ─── GRUPO 1: GERAL ───
-    containerEl.createEl("h3", { text: t("settings.groupGeneral") });
+    new Setting(containerEl).setName(t("settings.groupGeneral")).setHeading();
 
     // 1º. Auto-abrir (autoOpenForMd)
     new Setting(containerEl)
@@ -125,7 +125,7 @@ export class MarkMyMindSettingTab extends PluginSettingTab {
       );
 
     // ─── GRUPO 2: LAYOUT & LINHAS ───
-    containerEl.createEl("h3", { text: t("settings.groupLayout") });
+    new Setting(containerEl).setName(t("settings.groupLayout")).setHeading();
 
     // Layout padrão
     new Setting(containerEl)
@@ -189,7 +189,7 @@ export class MarkMyMindSettingTab extends PluginSettingTab {
       );
 
     // ─── GRUPO 3: ESTILO DOS BLOCOS ───
-    containerEl.createEl("h3", { text: t("settings.groupBlocks") });
+    new Setting(containerEl).setName(t("settings.groupBlocks")).setHeading();
 
     // Tamanho da fonte
     new Setting(containerEl)
@@ -250,7 +250,7 @@ export class MarkMyMindSettingTab extends PluginSettingTab {
           .addOption("right", t("alignment.right"))
           .setValue(this.plugin.settings.textAlign || "titleCenter")
           .onChange(async (value) => {
-            this.plugin.settings.textAlign = value as any;
+            this.plugin.settings.textAlign = value as "titleCenter" | "left" | "center" | "right";
             await this.plugin.saveSettings();
           })
       );
@@ -269,7 +269,7 @@ export class MarkMyMindSettingTab extends PluginSettingTab {
       );
 
     // ─── GRUPO 4: CORES ───
-    containerEl.createEl("h3", { text: t("settings.colors.title") });
+    new Setting(containerEl).setName(t("settings.colors.title")).setHeading();
 
     // Modo de cores
     new Setting(containerEl)
@@ -282,7 +282,7 @@ export class MarkMyMindSettingTab extends PluginSettingTab {
           .addOption("single", t("settings.colorMode.single"))
           .setValue(this.plugin.settings.colorMode || "level")
           .onChange(async (value) => {
-            this.plugin.settings.colorMode = value as any;
+            this.plugin.settings.colorMode = value as "level" | "branch" | "single";
             await this.plugin.saveSettings();
           })
       );

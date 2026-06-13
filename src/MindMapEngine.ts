@@ -6,7 +6,7 @@
  */
 
 import * as d3 from "d3";
-import { MarkdownRenderer, Component, Notice, Platform } from "obsidian";
+import { MarkdownRenderer, Component, Notice, Platform, App } from "obsidian";
 import { MindNode, getLevelColor, assignColors, findNodeById } from "./MarkdownParser";
 import {
   calculateLayout, LayoutType, NodePosition,
@@ -36,6 +36,7 @@ export class MindMapEngine {
   private onNodeMove: NodeMoveCallback;
   private component: Component;
   private getFilePath: () => string;
+  private app: App;
   private initialized = false;
   public selectedNodeId: string | null = null;
   public selectedNodeIds: Set<string> = new Set();
@@ -51,7 +52,8 @@ export class MindMapEngine {
     onNodeDelete: NodeDeleteCallback,
     onNodeMove: NodeMoveCallback,
     component: Component,
-    getFilePath: () => string
+    getFilePath: () => string,
+    app: App
   ) {
     this.container = container;
     this.settings = settings;
@@ -63,8 +65,9 @@ export class MindMapEngine {
 
     this.component = component;
     this.getFilePath = getFilePath;
+    this.app = app;
 
-    requestAnimationFrame(() => {
+    window.requestAnimationFrame(() => {
       this.initSVG();
       this.initialized = true;
       if (this.currentRoot) {
@@ -565,7 +568,7 @@ export class MindMapEngine {
       .style("margin", "auto 0")
       .node() as HTMLElement;
 
-    MarkdownRenderer.renderMarkdown(node.label, titleDiv, this.getFilePath(), this.component);
+    MarkdownRenderer.render(this.app, node.label, titleDiv, this.getFilePath(), this.component);
 
     const isSelected = this.selectedNodeIds.has(node.id);
     const shouldShowNote = node.noteText && (this.settings.showNoteText || (this.settings.autoExpandSelected && isSelected));
@@ -591,7 +594,7 @@ export class MindMapEngine {
         .style("flex", "1");
 
       const noteNode = noteDiv.node() as HTMLElement;
-      MarkdownRenderer.renderMarkdown(node.noteText || "", noteNode, this.getFilePath(), this.component);
+      MarkdownRenderer.render(this.app, node.noteText || "", noteNode, this.getFilePath(), this.component);
 
       if (isLimitActive) {
         noteNode.addEventListener("wheel", (e) => {
@@ -809,8 +812,8 @@ export class MindMapEngine {
       lastTap = currentTime;
 
       // Toque Longo
-      if (touchTimeout) clearTimeout(touchTimeout);
-      touchTimeout = setTimeout(() => {
+      if (touchTimeout) window.clearTimeout(touchTimeout);
+      touchTimeout = window.setTimeout(() => {
         event.stopPropagation();
         this.openNodeEditor(node, pos);
         touchTimeout = null;
@@ -825,7 +828,7 @@ export class MindMapEngine {
       // Se mover o dedo mais que 10px, cancela o toque longo (considera como arraste/scroll)
       if (Math.abs(dx) > 10 || Math.abs(dy) > 10) {
         if (touchTimeout) {
-          clearTimeout(touchTimeout);
+          window.clearTimeout(touchTimeout);
           touchTimeout = null;
         }
       }
@@ -833,14 +836,14 @@ export class MindMapEngine {
 
     g.on("touchend", () => {
       if (touchTimeout) {
-        clearTimeout(touchTimeout);
+        window.clearTimeout(touchTimeout);
         touchTimeout = null;
       }
     });
 
     g.on("touchcancel", () => {
       if (touchTimeout) {
-        clearTimeout(touchTimeout);
+        window.clearTimeout(touchTimeout);
         touchTimeout = null;
       }
     });

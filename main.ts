@@ -78,7 +78,6 @@ export default class MarkMyMindPlugin extends Plugin {
     this.addCommand({
       id: "create-or-open-map",
       name: t("commands.createOrOpenMap"),
-      hotkeys: [{ modifiers: ["Mod"], key: "m" }],
       callback: () => {
         const file = this.app.workspace.getActiveFile();
         if (file && file.extension === "md") {
@@ -164,7 +163,7 @@ export default class MarkMyMindPlugin extends Plugin {
 
             // 2. Se não estiver aberto em nenhuma aba de mapa, abre como Mapa Mental
             if (!pluginInstance.markdownModeFiles.has(file.path)) {
-              setTimeout(async () => {
+              window.setTimeout(async () => {
                 await this.setViewState({
                   type: MARKMYMIND_VIEW_TYPE,
                   active: true,
@@ -254,11 +253,11 @@ export default class MarkMyMindPlugin extends Plugin {
           });
         }
         if (view.markmymindButtonEl) {
-          view.markmymindButtonEl.style.display = ""; // Exibe o botão
+          view.markmymindButtonEl.removeClass("is-hidden"); // Exibe o botão
         }
       } else {
         if (view.markmymindButtonEl) {
-          view.markmymindButtonEl.style.display = "none"; // Oculta o botão
+          view.markmymindButtonEl.addClass("is-hidden"); // Oculta o botão
         }
       }
     });
