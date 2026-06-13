@@ -1,8 +1,8 @@
 {
   "id": "mark-my-mind",
-  "name": "MarkMyMind - Mindmap",
+  "name": "MarkMyMind Mindmap",
   "version": "1.0.0",
-  "minAppVersion": "1.0.0",
+  "minAppVersion": "1.4.0",
   "description": "Turns your Markdown notes into beautiful Mind Map with real-time sync.",
   "author": "PHM",
   "authorUrl": "https://github.com/PHM-ON/OBSIDIAN-MarkMyMind",
