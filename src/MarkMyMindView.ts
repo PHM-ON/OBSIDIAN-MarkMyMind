@@ -4,7 +4,7 @@
  * Ambos se sincronizam bidirecionalmente em tempo real.
  */
 
-import { ItemView, WorkspaceLeaf, TFile, Notice, TAbstractFile, ViewStateResult, Modal, App, setIcon, setTooltip, debounce } from "obsidian";
+import { ItemView, WorkspaceLeaf, TFile, Notice, TAbstractFile, Modal, App, setIcon, setTooltip, debounce } from "obsidian";
 import {
   parseMarkdown, MindNode,
   updateNodeContent, findNodeById,
@@ -136,7 +136,7 @@ export class MarkMyMindView extends ItemView {
     this.buildSidebar(this.sidebarEl);
 
     // Fechar todos os menus ativos ao clicar em qualquer lugar da tela
-    this.registerDomEvent(document, "click", (e: MouseEvent) => {
+    this.registerDomEvent(activeDocument, "click", (e: MouseEvent) => {
       const target = e.target as HTMLElement;
       // Se clicou no popover de cores ou no input de cores nativo, ignora para não fechar o submenu
       if (target.closest(".markmymind-palette-popover") || (target.tagName === "INPUT" && (target as HTMLInputElement).type === "color")) {
@@ -492,8 +492,7 @@ export class MarkMyMindView extends ItemView {
       colorBtns.push(btn);
     });
 
-    const colorPickerContainer = layoutColorsFlyout.createDiv({ cls: "markmymind-color-pickers-container" });
-    colorPickerContainer.style.cssText = "display:flex; flex-direction:column; gap:8px; margin-top:8px; align-items:center; width:100%; position:relative;";
+    const colorPickerContainer = layoutColorsFlyout.createDiv({ cls: "markmymind-color-pickers-container mm-color-picker-container" });
 
     const renderColorPickers = () => {
       colorPickerContainer.empty();
@@ -534,36 +533,24 @@ export class MarkMyMindView extends ItemView {
       const rowsCount = Math.ceil(pickers.length / maxCols);
 
       for (let r = 0; r < rowsCount; r++) {
-        const rowDiv = colorPickerContainer.createDiv();
-        rowDiv.style.cssText = "display:flex; gap:10px; justify-content:center; align-items:center; width:100%;";
+        const rowDiv = colorPickerContainer.createDiv({ cls: "mm-color-row" });
         
         const rowItems = pickers.slice(r * maxCols, (r + 1) * maxCols);
         
         rowItems.forEach((p) => {
-          const wrap = rowDiv.createDiv();
-          wrap.style.cssText = "display:flex; flex-direction:column; align-items:center; gap:2px; position:relative; min-width:42px;";
+          const wrap = rowDiv.createDiv({ cls: "mm-color-wrap" });
           
-          const pickWrap = wrap.createDiv();
-          pickWrap.style.cssText = "display:flex; align-items:center; gap:3px; position:relative;";
+          const pickWrap = wrap.createDiv({ cls: "mm-pick-wrap" });
 
-          const colorBadge = pickWrap.createDiv();
+          const colorBadge = pickWrap.createDiv({ cls: "mm-color-badge" });
           const currentColor = this.settings[p.key] || p.defaultVal;
-          colorBadge.style.cssText = `
-            width: 20px;
-            height: 20px;
-            border: 1px solid var(--background-modifier-border);
-            border-radius: 50%;
-            cursor: pointer;
-            background-color: ${currentColor};
-            box-shadow: 0 1px 3px rgba(0,0,0,0.15);
-            transition: transform 0.1s ease;
-          `;
+          colorBadge.setCssProps({ "--mm-badge-color": currentColor });
           
           colorBadge.addEventListener("click", (e) => {
             e.stopPropagation();
             this.showColorPalettePopover(colorBadge, p.key, p.defaultVal, async (newColor) => {
-              this.settings[p.key] = newColor;
-              colorBadge.style.backgroundColor = newColor;
+            this.settings[p.key] = newColor;
+              colorBadge.setCssProps({ "--mm-badge-color": newColor });
               await this.saveSettings();
               if (this.currentRoot) {
                 this.engine?.render(this.currentRoot, this.currentLayout);
@@ -572,33 +559,15 @@ export class MarkMyMindView extends ItemView {
           });
 
           const resetBtn = pickWrap.createEl("button", {
-            cls: "markmymind-btn markmymind-reset-btn",
+            cls: "mm-reset-btn-sm",
           });
-          resetBtn.style.cssText = `
-            width: 14px;
-            height: 14px;
-            min-height: 14px;
-            min-width: 14px;
-            padding: 0;
-            font-size: 8px;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            border: none;
-            background: rgba(255, 255, 255, 0.15);
-            color: var(--text-muted);
-            cursor: pointer;
-            opacity: 0.7;
-            margin: 0;
-          `;
-          resetBtn.innerHTML = "↺";
+          resetBtn.setText("↺");
           setTooltip(resetBtn, "Resetar");
           
           resetBtn.addEventListener("click", async (e) => {
             e.stopPropagation();
             this.settings[p.key] = p.defaultVal;
-            colorBadge.style.backgroundColor = p.defaultVal;
+            colorBadge.setCssProps({ "--mm-badge-color": p.defaultVal });
             await this.saveSettings();
             if (this.currentRoot) {
               this.engine?.render(this.currentRoot, this.currentLayout);
@@ -607,8 +576,8 @@ export class MarkMyMindView extends ItemView {
           
           const label = wrap.createEl("span", {
             text: p.label,
+            cls: "mm-color-label",
           });
-          label.style.cssText = "font-size: 9px; color: var(--text-muted); font-weight: 500;";
         });
       }
     };
@@ -1087,7 +1056,7 @@ export class MarkMyMindView extends ItemView {
       this.isSyncing = true;
       this.currentMdContent = newMd;
       this.autoSave(newMd).then(() => {
-        setTimeout(() => {
+        window.setTimeout(() => {
           this.isSyncing = false;
         }, 100);
       });
@@ -1188,53 +1157,35 @@ export class MarkMyMindView extends ItemView {
     const currentVal = this.settings[settingKey] || defaultVal;
 
     colors.forEach((color) => {
-      const colorBox = popover.createDiv();
+      const colorBox = popover.createDiv({ cls: "mm-color-box" });
       const isSelected = currentVal.toLowerCase() === color.toLowerCase();
       const borderColor = isSelected ? "var(--text-accent, #6366f1)" : "rgba(0,0,0,0.15)";
-      
-      colorBox.style.cssText = `
-        width: 24px;
-        height: 24px;
-        background-color: ${color};
-        border-radius: 6px;
-        cursor: pointer;
-        border: 2px solid ${borderColor};
-        box-shadow: ${isSelected ? "0 0 0 2px var(--background-primary)" : "none"};
-        box-sizing: border-box;
-        transition: transform 0.1s ease;
-      `;
+      const boxShadow = isSelected ? "0 0 0 2px var(--background-primary)" : "none";
+      colorBox.setCssProps({
+        "--mm-box-color": color,
+        "--mm-box-border": borderColor,
+        "--mm-box-shadow": boxShadow,
+      });
       colorBox.addEventListener("click", () => {
         onColorChange(color);
         popover.remove();
       });
-      colorBox.addEventListener("mouseenter", () => colorBox.style.transform = "scale(1.1)");
-      colorBox.addEventListener("mouseleave", () => colorBox.style.transform = "scale(1)");
     });
 
     // Bloco especial gradiente para cor personalizada
-    const customBox = popover.createDiv();
+    const customBox = popover.createDiv({ cls: "mm-color-box-gradient" });
     const isCustom = !colors.some(c => c.toLowerCase() === currentVal.toLowerCase());
     const customBorderColor = isCustom ? "var(--text-accent, #6366f1)" : "rgba(0,0,0,0.15)";
-    
-    customBox.style.cssText = `
-      width: 24px;
-      height: 24px;
-      background: linear-gradient(135deg, #ef4444, #f97316, #eab308, #22c55e, #3b82f6, #8b5cf6, #ec4899);
-      border-radius: 6px;
-      cursor: pointer;
-      border: 2px solid ${customBorderColor};
-      box-shadow: ${isCustom ? "0 0 0 2px var(--background-primary)" : "none"};
-      box-sizing: border-box;
-      transition: transform 0.1s ease;
-      position: relative;
-      overflow: hidden;
-    `;
+    const customShadow = isCustom ? "0 0 0 2px var(--background-primary)" : "none";
+    customBox.setCssProps({
+      "--mm-custom-border": customBorderColor,
+      "--mm-custom-shadow": customShadow,
+    });
     
     const hiddenInput = activeDocument.createElement("input");
     hiddenInput.type = "color";
     hiddenInput.value = currentVal;
-    // Ocultação transparente por cima do botão: abre nativamente na posição correta e contorna bloqueios de segurança do Chromium
-    hiddenInput.style.cssText = "position: absolute; top: 0; left: 0; width: 100%; height: 100%; opacity: 0; cursor: pointer; border: none; padding: 0; margin: 0; box-sizing: border-box;";
+    hiddenInput.addClass("mm-hidden-color-input");
     customBox.appendChild(hiddenInput);
 
     hiddenInput.addEventListener("click", (e) => {
@@ -1249,8 +1200,6 @@ export class MarkMyMindView extends ItemView {
       popover.remove();
     });
 
-    customBox.addEventListener("mouseenter", () => customBox.style.transform = "scale(1.1)");
-    customBox.addEventListener("mouseleave", () => customBox.style.transform = "scale(1)");
 
     const parentContainer = targetEl.closest(".markmymind-color-pickers-container") as HTMLElement;
     if (parentContainer) {
@@ -1258,10 +1207,16 @@ export class MarkMyMindView extends ItemView {
       const containerHeight = parentContainer.offsetHeight || 60;
       const popoverHeight = 108; // altura aproximada de 3 linhas
       const top = (containerHeight - popoverHeight) / 2;
-      popover.style.left = "50%";
-      popover.style.top = `${top}px`;
-      popover.style.transform = "translateX(-50%)";
-      popover.style.animation = "mm-popover-fade-in-centered 0.12s ease-out forwards";
+      popover.setCssProps({
+        "--mm-pop-left": "50%",
+        "--mm-pop-top": `${top}px`,
+        "--mm-pop-transform": "translateX(-50%)",
+        "--mm-pop-anim": "mm-popover-fade-in-centered 0.12s ease-out forwards",
+      });
+      popover.style.left = "var(--mm-pop-left)";
+      popover.style.top = "var(--mm-pop-top)";
+      popover.style.transform = "var(--mm-pop-transform)";
+      popover.style.animation = "var(--mm-pop-anim)";
     } else {
       activeDocument.body.appendChild(popover);
       // Posicionamento inteligente (evita sair da tela, ótimo para mobile)
@@ -1273,6 +1228,12 @@ export class MarkMyMindView extends ItemView {
       if (left + 140 > window.innerWidth) left = window.innerWidth - 150;
       if (top < 10) top = rect.bottom + window.scrollY + 8; // se não couber em cima, põe embaixo
 
+      popover.setCssProps({
+        "--mm-pop-left": `${left}px`,
+        "--mm-pop-top": `${top}px`,
+        "--mm-pop-transform": "none",
+        "--mm-pop-anim": "mm-popover-fade-in 0.12s ease-out forwards",
+      });
       popover.style.left = `${left}px`;
       popover.style.top = `${top}px`;
       popover.style.transform = "none";
@@ -1418,7 +1379,7 @@ export class MarkMyMindView extends ItemView {
     this.registerDomEvent(window, "keydown", (e: KeyboardEvent) => {
       if (this.app.workspace.getActiveViewOfType(MarkMyMindView) !== this) return;
 
-      const activeEl = document.activeElement;
+      const activeEl = activeDocument.activeElement;
       if (activeEl && (activeEl.tagName === "INPUT" || activeEl.tagName === "TEXTAREA")) {
         return;
       }
