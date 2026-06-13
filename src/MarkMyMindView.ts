@@ -290,7 +290,7 @@ export class MarkMyMindView extends ItemView {
           this.collapseTreeByLevel(this.currentRoot, parseInt(opt));
         }
         this.engine?.render(this.currentRoot, this.currentLayout);
-        setTimeout(() => this.engine?.fitView(), 50);
+        window.setTimeout(() => this.engine?.fitView(), 50);
       });
       this.levelBtns.push(lb);
     }
@@ -822,7 +822,8 @@ export class MarkMyMindView extends ItemView {
       // Mover nó (Drag and Drop)
       (draggedId, targetId, position, side) => this.onMapNodeMove(draggedId, targetId, position, side),
       this,
-      () => this.file?.path ?? ""
+      () => this.file?.path ?? "",
+      this.app
     );
   }
 
@@ -868,7 +869,7 @@ export class MarkMyMindView extends ItemView {
         const newMd = this.buildFullMarkdown();
         this.currentMdContent = newMd;
         this.autoSave(newMd).then(() => {
-          setTimeout(() => {
+          window.setTimeout(() => {
             this.isSyncing = false;
           }, 100);
         });
@@ -887,7 +888,7 @@ export class MarkMyMindView extends ItemView {
       const newMd = this.buildFullMarkdown();
       this.currentMdContent = newMd;
       this.autoSave(newMd).then(() => {
-        setTimeout(() => {
+        window.setTimeout(() => {
           this.isSyncing = false;
         }, 100);
       });
@@ -926,7 +927,7 @@ export class MarkMyMindView extends ItemView {
 
       this.engine?.render(this.currentRoot, this.currentLayout);
       if (centerAfter) {
-        setTimeout(() => this.engine?.fitView(), 80);
+        window.setTimeout(() => this.engine?.fitView(), 80);
       }
       this.setStatus("✓ Sincronizado");
     } catch (e) {
@@ -969,7 +970,7 @@ export class MarkMyMindView extends ItemView {
       this.currentMdContent = newMd;
       this.setStatus("✓ Mapa → Markdown");
       this.autoSave(newMd).then(() => {
-        setTimeout(() => {
+        window.setTimeout(() => {
           this.isSyncing = false;
         }, 100);
       });
@@ -1020,7 +1021,7 @@ export class MarkMyMindView extends ItemView {
     this.currentMdContent = newMd;
     
     this.autoSave(newMd).then(() => {
-      setTimeout(() => {
+      window.setTimeout(() => {
         this.isSyncing = false;
       }, 100);
     });
@@ -1058,7 +1059,7 @@ export class MarkMyMindView extends ItemView {
       this.currentMdContent = newMd;
       this.setStatus("✓ Blocos removidos");
       this.autoSave(newMd).then(() => {
-        setTimeout(() => {
+        window.setTimeout(() => {
           this.isSyncing = false;
         }, 100);
       });
@@ -1094,7 +1095,7 @@ export class MarkMyMindView extends ItemView {
 
     if (this.currentRoot) {
       this.engine?.render(this.currentRoot, normalized);
-      setTimeout(() => this.engine?.fitView(), 50);
+      window.setTimeout(() => this.engine?.fitView(), 50);
     }
   }
 
@@ -1152,10 +1153,10 @@ export class MarkMyMindView extends ItemView {
     onColorChange: (newColor: string) => void
   ): void {
     // Remove qualquer outro popover aberto
-    const existing = document.querySelector(".markmymind-palette-popover");
+    const existing = activeDocument.querySelector(".markmymind-palette-popover");
     if (existing) existing.remove();
 
-    const popover = document.createElement("div");
+    const popover = activeDocument.createElement("div");
     popover.className = "markmymind-palette-popover";
     popover.style.cssText = `
       position: absolute;
@@ -1229,7 +1230,7 @@ export class MarkMyMindView extends ItemView {
       overflow: hidden;
     `;
     
-    const hiddenInput = document.createElement("input");
+    const hiddenInput = activeDocument.createElement("input");
     hiddenInput.type = "color";
     hiddenInput.value = currentVal;
     // Ocultação transparente por cima do botão: abre nativamente na posição correta e contorna bloqueios de segurança do Chromium
@@ -1262,7 +1263,7 @@ export class MarkMyMindView extends ItemView {
       popover.style.transform = "translateX(-50%)";
       popover.style.animation = "mm-popover-fade-in-centered 0.12s ease-out forwards";
     } else {
-      document.body.appendChild(popover);
+      activeDocument.body.appendChild(popover);
       // Posicionamento inteligente (evita sair da tela, ótimo para mobile)
       const rect = targetEl.getBoundingClientRect();
       let left = rect.left + window.scrollX - 48; // centraliza levemente
@@ -1282,10 +1283,10 @@ export class MarkMyMindView extends ItemView {
       if (!popover.contains(e.target as Node) && !targetEl.contains(e.target as Node)) {
         popover.remove();
         hiddenInput.remove();
-        document.removeEventListener("mousedown", outsideClickListener);
+        activeDocument.removeEventListener("mousedown", outsideClickListener);
       }
     };
-    document.addEventListener("mousedown", outsideClickListener);
+    activeDocument.addEventListener("mousedown", outsideClickListener);
   }
 
   // ─── Persistência ─────────────────────────────────────────────────────────
@@ -1375,7 +1376,7 @@ export class MarkMyMindView extends ItemView {
     this.isSyncing = true;
     this.currentMdContent = previousContent;
     this.autoSave(previousContent).then(() => {
-      setTimeout(() => {
+      window.setTimeout(() => {
         this.isSyncing = false;
       }, 100);
     });
@@ -1400,7 +1401,7 @@ export class MarkMyMindView extends ItemView {
     this.isSyncing = true;
     this.currentMdContent = nextContent;
     this.autoSave(nextContent).then(() => {
-      setTimeout(() => {
+      window.setTimeout(() => {
         this.isSyncing = false;
       }, 100);
     });
