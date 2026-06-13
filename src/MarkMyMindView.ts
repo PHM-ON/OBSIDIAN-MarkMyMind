@@ -1213,10 +1213,12 @@ export class MarkMyMindView extends ItemView {
         "--mm-pop-transform": "translateX(-50%)",
         "--mm-pop-anim": "mm-popover-fade-in-centered 0.12s ease-out forwards",
       });
-      popover.style.left = "var(--mm-pop-left)";
-      popover.style.top = "var(--mm-pop-top)";
-      popover.style.transform = "var(--mm-pop-transform)";
-      popover.style.animation = "var(--mm-pop-anim)";
+      popover.setCssStyles({
+        left: "var(--mm-pop-left)",
+        top: "var(--mm-pop-top)",
+        transform: "var(--mm-pop-transform)",
+        animation: "var(--mm-pop-anim)",
+      });
     } else {
       activeDocument.body.appendChild(popover);
       // Posicionamento inteligente (evita sair da tela, ótimo para mobile)
@@ -1234,10 +1236,12 @@ export class MarkMyMindView extends ItemView {
         "--mm-pop-transform": "none",
         "--mm-pop-anim": "mm-popover-fade-in 0.12s ease-out forwards",
       });
-      popover.style.left = `${left}px`;
-      popover.style.top = `${top}px`;
-      popover.style.transform = "none";
-      popover.style.animation = "mm-popover-fade-in 0.12s ease-out forwards";
+      popover.setCssStyles({
+        left: `${left}px`,
+        top: `${top}px`,
+        transform: "none",
+        animation: "mm-popover-fade-in 0.12s ease-out forwards",
+      });
     }
 
     const outsideClickListener = (e: MouseEvent) => {
