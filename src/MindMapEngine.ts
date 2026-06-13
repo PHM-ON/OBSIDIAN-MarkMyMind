@@ -1048,17 +1048,21 @@ export class MindMapEngine {
         origMinHeight: walker.style.minHeight,
         origOverflow: walker.style.overflow,
       });
-      walker.style.height = `${rect.height}px`;
-      walker.style.minHeight = `${rect.height}px`;
-      walker.style.overflow = 'clip';
+      walker.setCssStyles({
+        height: `${rect.height}px`,
+        minHeight: `${rect.height}px`,
+        overflow: 'clip'
+      });
       walker = walker.parentElement;
       levels++;
     }
     cleanupFns.push(() => {
       for (const { el, origHeight, origMinHeight, origOverflow } of lockedEls) {
-        el.style.height = origHeight;
-        el.style.minHeight = origMinHeight;
-        el.style.overflow = origOverflow;
+        el.setCssStyles({
+          height: origHeight,
+          minHeight: origMinHeight,
+          overflow: origOverflow
+        });
       }
     });
 
