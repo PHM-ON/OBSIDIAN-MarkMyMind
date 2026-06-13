@@ -10,7 +10,7 @@ import { MarkdownRenderer, Component, Notice, Platform, App } from "obsidian";
 import { MindNode, getLevelColor, assignColors, findNodeById } from "./MarkdownParser";
 import {
   calculateLayout, LayoutType, NodePosition,
-  computeNodeHeight, computeNodeWidth, wrapText,
+  computeNodeHeight, computeNodeWidth,
   normalizeLayout
 } from "./LayoutEngine";
 import { MarkMyMindSettings } from "./settings";
@@ -573,7 +573,7 @@ export class MindMapEngine {
     const isSelected = this.selectedNodeIds.has(node.id);
     const shouldShowNote = node.noteText && (this.settings.showNoteText || (this.settings.autoExpandSelected && isSelected));
     if (shouldShowNote) {
-      titleDiv.style.margin = "0 0 4px 0";
+      titleDiv.addClass("mm-title-with-note");
 
       body.append("div")
         .attr("class", "mm-node-divider")
@@ -959,12 +959,13 @@ export class MindMapEngine {
     isTextArea?: boolean;
     onCommit: (v: string) => void;
   }): void {
-    const wrap = document.createElement("div");
+    const doc = this.container.ownerDocument;
+    const wrap = doc.createElement("div");
     wrap.className = "mm-inline-editor";
     wrap.style.cssText = `position:absolute;left:${opts.x}px;top:${opts.y}px;
       width:${opts.width}px;height:${opts.height}px;z-index:200;`;
 
-    const el = document.createElement(opts.isTextArea ? "textarea" : "input") as HTMLInputElement | HTMLTextAreaElement;
+    const el = doc.createElement(opts.isTextArea ? "textarea" : "input") as HTMLInputElement | HTMLTextAreaElement;
     if (!opts.isTextArea) {
       (el as HTMLInputElement).type = "text";
     }
