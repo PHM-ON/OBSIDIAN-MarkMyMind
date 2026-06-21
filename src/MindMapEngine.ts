@@ -1048,20 +1048,20 @@ export class MindMapEngine {
         origMinHeight: walker.style.minHeight,
         origOverflow: walker.style.overflow,
       });
-      walker.setCssStyles({
-        height: `${rect.height}px`,
-        minHeight: `${rect.height}px`,
-        overflow: 'clip'
+      walker.setCssProps({
+        "--mm-lock-height": `${rect.height}px`,
+        "--mm-lock-overflow": "clip",
       });
+      walker.addClass("mm-layout-locked");
       walker = walker.parentElement;
       levels++;
     }
     cleanupFns.push(() => {
       for (const { el, origHeight, origMinHeight, origOverflow } of lockedEls) {
-        el.setCssStyles({
-          height: origHeight,
-          minHeight: origMinHeight,
-          overflow: origOverflow
+        el.removeClass("mm-layout-locked");
+        el.setCssProps({
+          "--mm-lock-height": origHeight || "",
+          "--mm-lock-overflow": origOverflow || "",
         });
       }
     });
