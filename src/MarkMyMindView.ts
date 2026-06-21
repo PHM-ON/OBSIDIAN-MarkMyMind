@@ -1127,18 +1127,6 @@ export class MarkMyMindView extends ItemView {
 
     const popover = activeDocument.createElement("div");
     popover.className = "markmymind-palette-popover";
-    popover.style.cssText = `
-      position: absolute;
-      background: var(--background-secondary-alt, #191924);
-      border: 1px solid var(--background-modifier-border, #2d2d3d);
-      border-radius: 10px;
-      box-shadow: 0 4px 15px rgba(0,0,0,0.4);
-      padding: 10px;
-      display: grid;
-      grid-template-columns: repeat(4, 24px);
-      gap: 8px;
-      z-index: 9999;
-    `;
 
     const colors = [
       "#ef4444", // Vermelho
@@ -1213,12 +1201,6 @@ export class MarkMyMindView extends ItemView {
         "--mm-pop-transform": "translateX(-50%)",
         "--mm-pop-anim": "mm-popover-fade-in-centered 0.12s ease-out forwards",
       });
-      popover.setCssStyles({
-        left: "var(--mm-pop-left)",
-        top: "var(--mm-pop-top)",
-        transform: "var(--mm-pop-transform)",
-        animation: "var(--mm-pop-anim)",
-      });
     } else {
       activeDocument.body.appendChild(popover);
       // Posicionamento inteligente (evita sair da tela, ótimo para mobile)
@@ -1235,12 +1217,6 @@ export class MarkMyMindView extends ItemView {
         "--mm-pop-top": `${top}px`,
         "--mm-pop-transform": "none",
         "--mm-pop-anim": "mm-popover-fade-in 0.12s ease-out forwards",
-      });
-      popover.setCssStyles({
-        left: `${left}px`,
-        top: `${top}px`,
-        transform: "none",
-        animation: "mm-popover-fade-in 0.12s ease-out forwards",
       });
     }
 
