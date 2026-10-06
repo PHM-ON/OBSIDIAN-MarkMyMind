@@ -21,6 +21,15 @@ export type NodeAddChildCallback = (parentId: string, childLabel: string, side?:
 export type NodeDeleteCallback = (nodeId: string) => void;
 export type NodeMoveCallback = (draggedId: string, targetId: string, position: "before" | "after" | "inside", side?: "left" | "right") => void;
 
+export interface DragTargetInfo {
+  targetId: string;
+  position: "before" | "after" | "inside";
+  type?: "actual" | "proximity";
+  side?: "left" | "right";
+  rectPos?: { x: number; y: number; w: number; h: number; color: string };
+  circlePos?: { cx: number; cy: number };
+}
+
 export class MindMapEngine {
   private container: HTMLElement;
   private svg!: d3.Selection<SVGSVGElement, unknown, null, undefined>;
@@ -102,7 +111,7 @@ export class MindMapEngine {
 
     this.zoom = d3.zoom<SVGSVGElement, unknown>()
       .scaleExtent([0.08, 3])
-      .on("zoom", (e) => this.rootGroup.attr("transform", e.transform.toString()));
+      .on("zoom", (e: d3.D3ZoomEvent<SVGSVGElement, unknown>) => this.rootGroup.attr("transform", e.transform.toString()));
 
     this.svg.call(this.zoom);
     this.svg.on("dblclick.zoom", null);
@@ -118,7 +127,7 @@ export class MindMapEngine {
   private applyCenter(): void {
     const w = this.container.clientWidth || 800;
     const h = this.container.clientHeight || 600;
-    this.svg.call(this.zoom.transform, d3.zoomIdentity.translate(w / 2, h / 2));
+    this.svg.call((sel, tr) => this.zoom.transform(sel, tr), d3.zoomIdentity.translate(w / 2, h / 2));
   }
 
   // ─── Renderização Principal ────────────────────────────────────────────────
@@ -201,7 +210,7 @@ export class MindMapEngine {
         let startMouseY = 0;
 
         const dragBehavior = d3.drag<SVGGElement, unknown>()
-          .filter((event) => {
+          .filter((event: MouseEvent) => {
             // Se for mobile e o nó estiver selecionado, não inicia o drag para permitir o scroll
             if (Platform.isMobile && this.selectedNodeIds.has(node.id)) {
               return false;
@@ -209,18 +218,18 @@ export class MindMapEngine {
             // Ignora se o clique for com botão direito
             if (event.button !== 0) return false;
             // Ignora se o clique foi em um botão interativo (smart-btn, delete)
-            const target = event.target as SVGElement;
+            const target = event.target as SVGElement | null;
             if (
-              target.closest(".mm-smart-btn") ||
-              target.closest(".mm-delete-btn")
+              target?.closest(".mm-smart-btn") ||
+              target?.closest(".mm-delete-btn")
             ) {
               return false;
             }
             return true;
           })
-          .on("start", (event) => {
+          .on("start", (event: d3.D3DragEvent<SVGGElement, unknown, unknown>) => {
             event.sourceEvent.stopPropagation();
-            d3.select(event.sourceEvent.target).style("cursor", "grabbing");
+            d3.select(event.sourceEvent.target as d3.BaseType).style("cursor", "grabbing");
 
             // Salva coordenadas iniciais do mouse
             startMouseX = event.x;
@@ -233,7 +242,7 @@ export class MindMapEngine {
             dragGroup = null;
             dragTargetNode = null;
           })
-          .on("drag", (event) => {
+          .on("drag", (event: d3.D3DragEvent<SVGGElement, unknown, unknown>) => {
             // Cria o grupo temporário apenas no primeiro movimento de arraste real
             if (!dragGroup) {
               dragGroup = this.rootGroup.append("g").attr("class", "mm-temp-drag-group");
@@ -308,7 +317,7 @@ export class MindMapEngine {
             const mouseX = event.x;
             const mouseY = event.y;
 
-            let bestTarget: any = null;
+            let bestTarget: DragTargetInfo | null = null;
             let minDistance = Infinity;
 
             positions.forEach((otherPos, otherId) => {
@@ -410,21 +419,24 @@ export class MindMapEngine {
               }
             });
 
-            if (bestTarget && ghostRect && ghostCircle) {
-              dragTargetNode = { targetId: bestTarget.targetId, position: bestTarget.position, side: bestTarget.side };
-              if (bestTarget.position === "inside") {
+            // Variável intermediária para contornar limitação do TypeScript com narrowing dentro de closures
+            const resolvedTarget = bestTarget as DragTargetInfo | null;
+
+            if (resolvedTarget && ghostRect && ghostCircle) {
+              dragTargetNode = { targetId: resolvedTarget.targetId, position: resolvedTarget.position, side: resolvedTarget.side };
+              if (resolvedTarget.position === "inside" && resolvedTarget.rectPos) {
                 ghostRect
-                  .attr("x", bestTarget.rectPos.x - 4)
-                  .attr("y", bestTarget.rectPos.y - 4)
-                  .attr("width", bestTarget.rectPos.w + 8)
-                  .attr("height", bestTarget.rectPos.h + 8)
-                  .attr("stroke", bestTarget.rectPos.color)
+                  .attr("x", resolvedTarget.rectPos.x - 4)
+                  .attr("y", resolvedTarget.rectPos.y - 4)
+                  .attr("width", resolvedTarget.rectPos.w + 8)
+                  .attr("height", resolvedTarget.rectPos.h + 8)
+                  .attr("stroke", resolvedTarget.rectPos.color)
                   .style("opacity", "1");
                 ghostCircle.style("opacity", "0");
-              } else {
+              } else if (resolvedTarget.circlePos) {
                 ghostCircle
-                  .attr("cx", bestTarget.circlePos.cx)
-                  .attr("cy", bestTarget.circlePos.cy)
+                  .attr("cx", resolvedTarget.circlePos.cx)
+                  .attr("cy", resolvedTarget.circlePos.cy)
                   .attr("fill", color)
                   .style("opacity", "1");
                 ghostRect.style("opacity", "0");
@@ -435,12 +447,11 @@ export class MindMapEngine {
               ghostCircle.style("opacity", "0");
             }
           })
-          .on("end", (event) => {
-            d3.select(event.sourceEvent.target).style("cursor", "grab");
+          .on("end", (event: d3.D3DragEvent<SVGGElement, unknown, unknown>) => {
+            d3.select(event.sourceEvent.target as d3.BaseType).style("cursor", "grab");
             if (ghostRect) { ghostRect.remove(); ghostRect = null; }
             if (ghostCircle) { ghostCircle.remove(); ghostCircle = null; }
 
-            const self = this;
             if (dragTargetNode) {
               this.onNodeMove(node.id, dragTargetNode.targetId, dragTargetNode.position, dragTargetNode.side);
               if (dragGroup) {
@@ -453,7 +464,7 @@ export class MindMapEngine {
                 const domNode = dragGroup.node();
                 if (domNode) {
                   while (domNode.firstChild) {
-                    self.rootGroup.node()?.appendChild(domNode.firstChild);
+                    this.rootGroup.node()?.appendChild(domNode.firstChild);
                   }
                 }
                 dragGroup.remove();
@@ -490,11 +501,12 @@ export class MindMapEngine {
   ): void {
     // ClipPath único por nó para evitar overflow de texto
     const clipId = `mm-clip-${node.id}`;
-    const svgEl = this.svg.node()!;
-    let defs = d3.select(svgEl).select("defs");
-    let clip: d3.Selection<any, any, any, any> = defs.select(`#${clipId}`);
+    const svgEl = this.svg.node();
+    if (!svgEl) return;
+    const defs = d3.select(svgEl).select("defs");
+    let clip: d3.Selection<SVGClipPathElement, unknown, null, undefined> = defs.select<SVGClipPathElement>(`#${clipId}`);
     if (clip.empty()) {
-      clip = defs.append("clipPath").attr("id", clipId);
+      clip = defs.append<SVGClipPathElement>("clipPath").attr("id", clipId);
       clip.append("rect").attr("rx", 10);
     }
     clip.select("rect")
@@ -568,7 +580,7 @@ export class MindMapEngine {
       .style("margin", "auto 0")
       .node() as HTMLElement;
 
-    MarkdownRenderer.render(this.app, node.label, titleDiv, this.getFilePath(), this.component);
+    void MarkdownRenderer.render(this.app, node.label, titleDiv, this.getFilePath(), this.component);
 
     const isSelected = this.selectedNodeIds.has(node.id);
     const shouldShowNote = node.noteText && (this.settings.showNoteText || (this.settings.autoExpandSelected && isSelected));
@@ -594,7 +606,7 @@ export class MindMapEngine {
         .style("flex", "1");
 
       const noteNode = noteDiv.node() as HTMLElement;
-      MarkdownRenderer.render(this.app, node.noteText || "", noteNode, this.getFilePath(), this.component);
+      void MarkdownRenderer.render(this.app, node.noteText || "", noteNode, this.getFilePath(), this.component);
 
       if (isLimitActive) {
         noteNode.addEventListener("wheel", (e) => {
@@ -740,28 +752,27 @@ export class MindMapEngine {
     g: d3.Selection<SVGGElement, unknown, null, undefined>,
     w: number, h: number, color: string, isRoot: boolean, node: MindNode
   ): void {
-    const self = this;
-    g.on("mouseenter", function () {
-      const isSelected = self.selectedNodeIds.has(node.id);
-      d3.select(this).select(".mm-node-rect")
+    g.on("mouseenter", (event: MouseEvent) => {
+      const isSelected = this.selectedNodeIds.has(node.id);
+      d3.select(event.currentTarget as SVGGElement).select(".mm-node-rect")
         .transition().duration(120)
         .attr("stroke-width", isSelected ? 3.5 : (isRoot ? 3.5 : 2.8));
       // Smart button: sempre aparece totalmente no hover
-      d3.select(this).selectAll(".mm-smart-btn")
+      d3.select(event.currentTarget as SVGGElement).selectAll(".mm-smart-btn")
         .transition().duration(150).style("opacity", "1");
-      d3.select(this).select(".mm-delete-btn")
+      d3.select(event.currentTarget as SVGGElement).select(".mm-delete-btn")
         .transition().duration(150)
         .style("opacity", "1")
         .style("pointer-events", "auto");
-    }).on("mouseleave", function () {
-      const isSelected = self.selectedNodeIds.has(node.id);
-      d3.select(this).select(".mm-node-rect")
+    }).on("mouseleave", (event: MouseEvent) => {
+      const isSelected = this.selectedNodeIds.has(node.id);
+      d3.select(event.currentTarget as SVGGElement).select(".mm-node-rect")
         .transition().duration(120)
         .attr("stroke-width", isSelected ? 3.5 : (isRoot ? 2.5 : 1.8));
       
       const restoreDeleteOpacity = isSelected ? "1" : "0";
       const restoreDeletePointerEvents = isSelected ? "auto" : "none";
-      d3.select(this).select(".mm-delete-btn")
+      d3.select(event.currentTarget as SVGGElement).select(".mm-delete-btn")
         .transition().duration(150)
         .style("opacity", restoreDeleteOpacity)
         .style("pointer-events", restoreDeletePointerEvents);
@@ -769,7 +780,7 @@ export class MindMapEngine {
       const hasChildren = node.children.length > 0;
       const isCollapsed = node.collapsed;
       const restoreOpacity = hasChildren ? (isCollapsed ? "1" : "0.2") : "0";
-      d3.select(this).selectAll(".mm-smart-btn")
+      d3.select(event.currentTarget as SVGGElement).selectAll(".mm-smart-btn")
         .transition().duration(150).style("opacity", restoreOpacity);
     });
   }
@@ -784,7 +795,7 @@ export class MindMapEngine {
     });
 
     // Eventos de toque para dispositivos móveis (duplo toque e toque longo)
-    let touchTimeout: any = null;
+    let touchTimeout: number | null = null;
     let lastTap = 0;
     let touchStartX = 0;
     let touchStartY = 0;
@@ -802,7 +813,7 @@ export class MindMapEngine {
       if (tapLength < 300 && tapLength > 0) {
         event.stopPropagation();
         if (touchTimeout) {
-          clearTimeout(touchTimeout);
+          window.clearTimeout(touchTimeout);
           touchTimeout = null;
         }
         this.openNodeEditor(node, pos);

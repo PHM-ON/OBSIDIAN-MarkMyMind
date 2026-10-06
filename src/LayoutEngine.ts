@@ -149,10 +149,10 @@ export function computeNodeHeight(
 }
 
 /** Ponto de entrada: calcula o layout */
-export function normalizeLayout(layout: any): LayoutType {
+export function normalizeLayout(layout: unknown): LayoutType {
   if (layout === "horizontal") return "right";
   if (layout === "vertical") return "down";
-  if (layout === "right" || layout === "down" || layout === "bidirectional" || layout === "up") return layout;
+  if (layout === "right" || layout === "down" || layout === "bidirectional" || layout === "up") return layout as LayoutType;
   return "right";
 }
 
