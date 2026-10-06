@@ -3,6 +3,8 @@
  * Converte conteúdo Markdown em árvore de nós do MindMap e vice-versa.
  */
 
+import { MarkMyMindSettings } from "./settings";
+
 export interface MindNode {
   id: string;
   label: string;
@@ -206,7 +208,7 @@ export function deleteNodeById(root: MindNode, id: string): boolean {
 }
 
 /** Recalcula as cores da árvore de nós baseando-se no esquema configurado */
-export function assignColors(root: MindNode, settings: any): void {
+export function assignColors(root: MindNode, settings: MarkMyMindSettings): void {
   const mode = settings.colorMode || "level";
   const baseColors = [
     settings.colorH1 || "#6366f1",

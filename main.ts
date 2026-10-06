@@ -4,7 +4,7 @@
  * Nós visuais em bloco, conversão bidirecional, canvas com zoom/pan.
  */
 
-import { Plugin, TFile, TFolder, WorkspaceLeaf, Notice, MarkdownView } from "obsidian";
+import { Plugin, TFile, TFolder, WorkspaceLeaf, Notice, MarkdownView, OpenViewState } from "obsidian";
 import { MarkMyMindView, MARKMYMIND_VIEW_TYPE } from "./src/MarkMyMindView";
 import { MarkMyMindSettings, DEFAULT_SETTINGS, MarkMyMindSettingTab } from "./src/settings";
 import { initI18n, t } from "./src/i18n";
@@ -14,7 +14,8 @@ export default class MarkMyMindPlugin extends Plugin {
   markdownModeFiles: Set<string> = new Set();
   lastActiveMarkdownLeaf: WorkspaceLeaf | null = null;
   lastActiveLeafWasMindmap = false;
-  originalOpenFile: any;
+  // eslint-disable-next-line @typescript-eslint/unbound-method
+  originalOpenFile: ((this: WorkspaceLeaf, file: TFile, state?: OpenViewState) => Promise<void>) | null = null;
   historyMap: Map<string, { undoStack: string[], redoStack: string[] }> = new Map();
   splitLeaves: Map<string, WorkspaceLeaf> = new Map();
 
@@ -57,7 +58,7 @@ export default class MarkMyMindPlugin extends Plugin {
         const file = this.app.workspace.getActiveFile();
         if (file && file.extension === "md") {
           if (!checking) {
-            this.openMarkMyMindView(file);
+            void this.openMarkMyMindView(file);
           }
           return true;
         }
@@ -70,7 +71,7 @@ export default class MarkMyMindPlugin extends Plugin {
       id: "create-new-mindmap",
       name: t("commands.createNew"),
       callback: () => {
-        this.createNewMindmapFile();
+        void this.createNewMindmapFile();
       },
     });
 
@@ -81,9 +82,9 @@ export default class MarkMyMindPlugin extends Plugin {
       callback: () => {
         const file = this.app.workspace.getActiveFile();
         if (file && file.extension === "md") {
-          this.openMarkMyMindView(file);
+          void this.openMarkMyMindView(file);
         } else {
-          this.createNewMindmapFile();
+          void this.createNewMindmapFile();
         }
       },
     });
@@ -92,9 +93,9 @@ export default class MarkMyMindPlugin extends Plugin {
     this.addRibbonIcon("brain-circuit", t("ribbon.tooltip"), () => {
       const file = this.app.workspace.getActiveFile();
       if (file && file.extension === "md") {
-        this.openMarkMyMindView(file);
+        void this.openMarkMyMindView(file);
       } else {
-        this.createNewMindmapFile();
+        void this.createNewMindmapFile();
       }
     });
 
@@ -107,7 +108,9 @@ export default class MarkMyMindPlugin extends Plugin {
             item
               .setTitle(t("menu.openAs"))
               .setIcon("brain-circuit")
-              .onClick(() => this.openMarkMyMindView(file));
+              .onClick(() => {
+                void this.openMarkMyMindView(file);
+              });
           });
         }
 
@@ -134,62 +137,63 @@ export default class MarkMyMindPlugin extends Plugin {
     );
 
     // ── Interceptador nativo de openFile na WorkspaceLeaf para evitar qualquer lag ou aba duplicada ──
+    // eslint-disable-next-line @typescript-eslint/unbound-method
     const originalOpenFile = WorkspaceLeaf.prototype.openFile;
-    const pluginInstance = this;
+    this.originalOpenFile = originalOpenFile;
 
-    WorkspaceLeaf.prototype.openFile = async function (file: TFile, state?: any) {
+    const interceptOpenFile = async (leaf: WorkspaceLeaf, file: TFile, state?: OpenViewState): Promise<boolean> => {
       if (file && file.extension === "md") {
         try {
-          const cache = pluginInstance.app.metadataCache.getFileCache(file);
-          const isMindmap = cache?.frontmatter?.["mmm-type"] === "mindmap" || pluginInstance.settings.autoOpenForMd;
+          const cache = this.app.metadataCache.getFileCache(file);
+          const isMindmap = cache?.frontmatter?.["mmm-type"] === "mindmap" || this.settings.autoOpenForMd;
 
           if (isMindmap) {
             // 1. Verifica se já está aberto em uma view MarkMyMindView
-            const existingLeaves = pluginInstance.app.workspace.getLeavesOfType(MARKMYMIND_VIEW_TYPE);
+            const existingLeaves = this.app.workspace.getLeavesOfType(MARKMYMIND_VIEW_TYPE);
             const alreadyOpenLeaf = existingLeaves.find(
               (l) => l.view instanceof MarkMyMindView && l.view.file?.path === file.path
             );
 
-            if (alreadyOpenLeaf && alreadyOpenLeaf !== this) {
+            if (alreadyOpenLeaf && alreadyOpenLeaf !== leaf) {
               // Foca imediatamente na aba existente
-              pluginInstance.app.workspace.revealLeaf(alreadyOpenLeaf);
+              void this.app.workspace.revealLeaf(alreadyOpenLeaf);
 
               // Se a folha que tentou abrir for uma nova aba vazia, fecha ela
-              if (this.view.getViewType() === "empty") {
-                this.detach();
+              if (leaf.view.getViewType() === "empty") {
+                leaf.detach();
               }
-              return; // Bloqueia a abertura duplicada sem lag
+              return true; // Bloqueia a abertura duplicada sem lag
             }
 
             // 2. Se não estiver aberto em nenhuma aba de mapa, abre como Mapa Mental
-            if (!pluginInstance.markdownModeFiles.has(file.path)) {
-              window.setTimeout(async () => {
-                await this.setViewState({
+            if (!this.markdownModeFiles.has(file.path)) {
+              window.setTimeout(() => {
+                void leaf.setViewState({
                   type: MARKMYMIND_VIEW_TYPE,
                   active: true,
                   state: { file: file.path }
                 });
               }, 50);
-              return; // Converte diretamente sem instanciar MarkdownView
+              return true; // Converte diretamente sem instanciar MarkdownView
             }
           } else {
             // É uma nota normal!
             // Se a aba ativa anterior era um Mapa Mental, vamos redirecionar para a última aba markdown ativa
-            const wasMindmapActive = pluginInstance.lastActiveLeafWasMindmap;
-            if (wasMindmapActive && pluginInstance.lastActiveMarkdownLeaf) {
+            const wasMindmapActive = this.lastActiveLeafWasMindmap;
+            if (wasMindmapActive && this.lastActiveMarkdownLeaf) {
               const allLeaves: WorkspaceLeaf[] = [];
-              pluginInstance.app.workspace.iterateAllLeaves((l) => { allLeaves.push(l); });
-              const leafExists = allLeaves.includes(pluginInstance.lastActiveMarkdownLeaf);
+              this.app.workspace.iterateAllLeaves((l) => { allLeaves.push(l); });
+              const leafExists = allLeaves.includes(this.lastActiveMarkdownLeaf);
 
-              if (leafExists && this !== pluginInstance.lastActiveMarkdownLeaf) {
-                await pluginInstance.lastActiveMarkdownLeaf.openFile(file, state);
-                pluginInstance.app.workspace.revealLeaf(pluginInstance.lastActiveMarkdownLeaf);
+              if (leafExists && leaf !== this.lastActiveMarkdownLeaf) {
+                await this.lastActiveMarkdownLeaf.openFile(file, state);
+                void this.app.workspace.revealLeaf(this.lastActiveMarkdownLeaf);
                 
                 // Se a folha que tentou abrir for uma nova aba vazia, fecha ela
-                if (this.view.getViewType() === "empty") {
-                  this.detach();
+                if (leaf.view.getViewType() === "empty") {
+                  leaf.detach();
                 }
-                return;
+                return true;
               }
             }
           }
@@ -197,12 +201,15 @@ export default class MarkMyMindPlugin extends Plugin {
           console.error("[Mark My Mind] Erro ao interceptar openFile:", e);
         }
       }
-
-      // Executa o comportamento padrão do Obsidian
-      return originalOpenFile.call(this, file, state);
+      return false;
     };
 
-    this.originalOpenFile = originalOpenFile;
+    WorkspaceLeaf.prototype.openFile = async function (this: WorkspaceLeaf, file: TFile, state?: OpenViewState) {
+      const handled = await interceptOpenFile(this, file, state);
+      if (!handled && originalOpenFile) {
+        return originalOpenFile.call(this, file, state);
+      }
+    };
 
     // ── Aba de configurações ──
     this.addSettingTab(new MarkMyMindSettingTab(this.app, this));
@@ -220,7 +227,7 @@ export default class MarkMyMindPlugin extends Plugin {
   // ─── Settings ─────────────────────────────────────────────────────────────
 
   async loadSettings(): Promise<void> {
-    this.settings = Object.assign({}, DEFAULT_SETTINGS, await this.loadData());
+    this.settings = Object.assign({}, DEFAULT_SETTINGS, (await this.loadData()) as Partial<MarkMyMindSettings> | null);
   }
 
   async saveSettings(): Promise<void> {
@@ -230,21 +237,23 @@ export default class MarkMyMindPlugin extends Plugin {
   // ─── Abertura da View ─────────────────────────────────────────────────────
 
   /** Rastreia e adiciona o botão de alternância no editor de texto */
-  addToggleModeButton(leaf: WorkspaceLeaf) {
-    const view = leaf.view as any;
+  addToggleModeButton(leaf: WorkspaceLeaf): void {
+    const view = leaf.view;
+    if (!(view instanceof MarkdownView)) return;
     const file = view.file;
     if (!file) return;
 
-    this.app.vault.cachedRead(file).then((content) => {
+    void this.app.vault.cachedRead(file).then((content) => {
       const isMindmap = /mmm-type:\s*['"]?mindmap['"]?/.test(content) || this.settings.autoOpenForMd;
+      const customView = view as MarkdownView & { markmymindButtonEl?: HTMLElement };
       
       if (isMindmap) {
-        if (!view.markmymindButtonEl) {
-          view.markmymindButtonEl = view.addAction("brain-circuit", t("menu.openAs"), async () => {
+        if (!customView.markmymindButtonEl) {
+          customView.markmymindButtonEl = view.addAction("brain-circuit", t("menu.openAs"), () => {
             const currentFile = view.file;
             if (currentFile) {
               this.markdownModeFiles.delete(currentFile.path);
-              await leaf.setViewState({
+              void leaf.setViewState({
                 type: MARKMYMIND_VIEW_TYPE,
                 active: true,
                 state: { file: currentFile.path }
@@ -252,12 +261,12 @@ export default class MarkMyMindPlugin extends Plugin {
             }
           });
         }
-        if (view.markmymindButtonEl) {
-          view.markmymindButtonEl.removeClass("is-hidden"); // Exibe o botão
+        if (customView.markmymindButtonEl) {
+          customView.markmymindButtonEl.removeClass("is-hidden"); // Exibe o botão
         }
       } else {
-        if (view.markmymindButtonEl) {
-          view.markmymindButtonEl.addClass("is-hidden"); // Oculta o botão
+        if (customView.markmymindButtonEl) {
+          customView.markmymindButtonEl.addClass("is-hidden"); // Oculta o botão
         }
       }
     });
@@ -278,7 +287,7 @@ export default class MarkMyMindPlugin extends Plugin {
 
     if (fileLeaf) {
       // Se já estiver aberto, apenas foca na aba existente
-      workspace.revealLeaf(fileLeaf);
+      void workspace.revealLeaf(fileLeaf);
       return;
     }
 
@@ -291,7 +300,7 @@ export default class MarkMyMindPlugin extends Plugin {
       state: { file: file.path }
     });
 
-    workspace.revealLeaf(leaf);
+    void workspace.revealLeaf(leaf);
   }
 
   /** Cria um novo arquivo Markdown em branco para Mapa Mental e o abre */

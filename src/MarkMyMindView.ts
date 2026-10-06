@@ -15,6 +15,7 @@ import { MindMapEngine } from "./MindMapEngine";
 import { LayoutType, normalizeLayout } from "./LayoutEngine";
 import { MarkMyMindSettings, DEFAULT_SETTINGS } from "./settings";
 import { t } from "./i18n";
+import type MarkMyMindPlugin from "../main";
 
 export const MARKMYMIND_VIEW_TYPE = "markmymind-on-view";
 
@@ -26,7 +27,7 @@ export class MarkMyMindView extends ItemView {
   currentLayout: LayoutType;
   private currentMdContent = "";
   private isSyncing = false;
-  private debouncedReload: any;
+  private debouncedReload!: (file: TFile) => void;
 
   private maxHistorySize = 100;
   // DOM
@@ -40,9 +41,9 @@ export class MarkMyMindView extends ItemView {
   private singleH1RootBtn: HTMLButtonElement | null = null;
 
   saveSettings: () => Promise<void>;
-  plugin: any;
+  plugin?: MarkMyMindPlugin;
 
-  constructor(leaf: WorkspaceLeaf, settings: MarkMyMindSettings, saveSettings: () => Promise<void>, plugin?: any) {
+  constructor(leaf: WorkspaceLeaf, settings: MarkMyMindSettings, saveSettings: () => Promise<void>, plugin?: MarkMyMindPlugin) {
     super(leaf);
     this.navigation = true; // Informa ao Obsidian que esta view suporta navegação de arquivos
     this.settings = settings;
@@ -101,7 +102,7 @@ export class MarkMyMindView extends ItemView {
     const content = await this.app.vault.cachedRead(file);
     this.currentMdContent = content;
     this.syncMdToMap(content, true);
-    (this.leaf as any).updateHeader();
+    (this.leaf as WorkspaceLeaf & { updateHeader?: () => void }).updateHeader?.();
 
     if (this.splitBtn) {
       if (this.plugin?.isSplitActive?.(file.path)) {
@@ -214,13 +215,15 @@ export class MarkMyMindView extends ItemView {
     });
     setIcon(this.selectedBtn, "mouse-pointer");
     setTooltip(this.selectedBtn, t("toolbar.selectedTooltip"));
-    this.selectedBtn.addEventListener("click", async () => {
-      this.settings.autoFocusOnSelect = !this.settings.autoFocusOnSelect;
-      this.selectedBtn?.classList.toggle("active", this.settings.autoFocusOnSelect);
-      await this.saveSettings();
-      if (this.settings.autoFocusOnSelect) {
-        this.engine?.focusOnSelected();
-      }
+    this.selectedBtn.addEventListener("click", () => {
+      void (async () => {
+        this.settings.autoFocusOnSelect = !this.settings.autoFocusOnSelect;
+        this.selectedBtn?.classList.toggle("active", this.settings.autoFocusOnSelect);
+        await this.saveSettings();
+        if (this.settings.autoFocusOnSelect) {
+          this.engine?.focusOnSelected();
+        }
+      })();
     });
 
     toolbar.createDiv({ cls: "markmymind-toolbar-sep" });
@@ -232,8 +235,8 @@ export class MarkMyMindView extends ItemView {
     setIcon(this.titlesBtn, "type");
     this.updateTitlesBtnVisual();
 
-    this.titlesBtn.addEventListener("click", async () => {
-      await this.cycleTitlesState();
+    this.titlesBtn.addEventListener("click", () => {
+      void this.cycleTitlesState();
     });
 
     this.singleH1RootBtn = toolbar.createEl("button", {
@@ -242,12 +245,14 @@ export class MarkMyMindView extends ItemView {
     setIcon(this.singleH1RootBtn, "folder-tree");
     setTooltip(this.singleH1RootBtn, t("toolbar.singleH1RootTooltip"));
 
-    this.singleH1RootBtn.addEventListener("click", async () => {
-      this.settings.singleH1Root = !this.settings.singleH1Root;
-      this.singleH1RootBtn?.classList.toggle("active", this.settings.singleH1Root);
-      await this.saveSettings();
-      this.syncMdToMap(this.currentMdContent, false);
-      this.engine?.fitView();
+    this.singleH1RootBtn.addEventListener("click", () => {
+      void (async () => {
+        this.settings.singleH1Root = !this.settings.singleH1Root;
+        this.singleH1RootBtn?.classList.toggle("active", this.settings.singleH1Root);
+        await this.saveSettings();
+        this.syncMdToMap(this.currentMdContent, false);
+        this.engine?.fitView();
+      })();
     });
 
     toolbar.createDiv({ cls: "markmymind-toolbar-sep" });
@@ -321,17 +326,19 @@ export class MarkMyMindView extends ItemView {
     });
     setIcon(backBtn, "file-text");
     setTooltip(backBtn, t("toolbar.backToEditor"));
-    backBtn.addEventListener("click", async () => {
-      if (this.file) {
-        if (this.plugin) {
-          this.plugin.markdownModeFiles.add(this.file.path);
+    backBtn.addEventListener("click", () => {
+      void (async () => {
+        if (this.file) {
+          if (this.plugin) {
+            this.plugin.markdownModeFiles.add(this.file.path);
+          }
+          await this.leaf.setViewState({
+            type: "markdown",
+            state: { file: this.file.path },
+            active: true,
+          });
         }
-        await this.leaf.setViewState({
-          type: "markdown",
-          state: { file: this.file.path },
-          active: true,
-        });
-      }
+      })();
     });
 
     // Botão Split Tela (Editor + MindMap)
@@ -340,11 +347,13 @@ export class MarkMyMindView extends ItemView {
     });
     setIcon(this.splitBtn, "columns-2");
     setTooltip(this.splitBtn, t("toolbar.splitView"));
-    this.splitBtn.addEventListener("click", async () => {
-      if (!this.file) return;
-      if (this.plugin) {
-        await this.plugin.toggleSplitView(this.file, this.leaf);
-      }
+    this.splitBtn.addEventListener("click", () => {
+      void (async () => {
+        if (!this.file) return;
+        if (this.plugin) {
+          await this.plugin.toggleSplitView(this.file, this.leaf);
+        }
+      })();
     });
 
     toolbar.createDiv({ cls: "markmymind-toolbar-sep" });
@@ -397,7 +406,7 @@ export class MarkMyMindView extends ItemView {
     return flyout;
   }
 
-  private createFlyoutRow(flyout: HTMLElement, labelText: string, emoji = "", onReset?: () => void): HTMLDivElement {
+  private createFlyoutRow(flyout: HTMLElement, labelText: string, emoji = "", onReset?: () => void | Promise<void>): HTMLDivElement {
     const row = flyout.createDiv({ cls: "markmymind-sidebar-flyout-row" });
     
     const content = row.createDiv({ cls: "markmymind-popover-row-content" });
@@ -408,7 +417,9 @@ export class MarkMyMindView extends ItemView {
         title: t("popover.restoreDefault")
       });
       setIcon(resetBtn, "reset");
-      resetBtn.addEventListener("click", onReset);
+      resetBtn.addEventListener("click", () => {
+        if (onReset) void onReset();
+      });
     }
     
     return content;
@@ -481,13 +492,15 @@ export class MarkMyMindView extends ItemView {
         cls: `markmymind-btn markmymind-option-btn ${(this.settings.colorMode || "level") === opt.value ? "active" : ""}`,
         text: opt.text
       });
-      btn.addEventListener("click", async () => {
-        colorBtns.forEach(b => b.removeClass("active"));
-        btn.addClass("active");
-        this.settings.colorMode = opt.value as any;
-        await this.saveSettings();
-        renderColorPickers();
-        if (this.currentRoot) this.engine?.render(this.currentRoot, this.currentLayout);
+      btn.addEventListener("click", () => {
+        void (async () => {
+          colorBtns.forEach(b => b.removeClass("active"));
+          btn.addClass("active");
+          this.settings.colorMode = opt.value as "level" | "branch" | "single";
+          await this.saveSettings();
+          renderColorPickers();
+          if (this.currentRoot) this.engine?.render(this.currentRoot, this.currentLayout);
+        })();
       });
       colorBtns.push(btn);
     });
@@ -548,13 +561,15 @@ export class MarkMyMindView extends ItemView {
           
           colorBadge.addEventListener("click", (e) => {
             e.stopPropagation();
-            this.showColorPalettePopover(colorBadge, p.key, p.defaultVal, async (newColor) => {
-            this.settings[p.key] = newColor;
-              colorBadge.setCssProps({ "--mm-badge-color": newColor });
-              await this.saveSettings();
-              if (this.currentRoot) {
-                this.engine?.render(this.currentRoot, this.currentLayout);
-              }
+            this.showColorPalettePopover(colorBadge, p.key, p.defaultVal, (newColor) => {
+              void (async () => {
+                this.settings[p.key] = newColor;
+                colorBadge.setCssProps({ "--mm-badge-color": newColor });
+                await this.saveSettings();
+                if (this.currentRoot) {
+                  this.engine?.render(this.currentRoot, this.currentLayout);
+                }
+              })();
             });
           });
 
@@ -564,17 +579,19 @@ export class MarkMyMindView extends ItemView {
           resetBtn.setText("↺");
           setTooltip(resetBtn, "Resetar");
           
-          resetBtn.addEventListener("click", async (e) => {
+          resetBtn.addEventListener("click", (e) => {
             e.stopPropagation();
-            this.settings[p.key] = p.defaultVal;
-            colorBadge.setCssProps({ "--mm-badge-color": p.defaultVal });
-            await this.saveSettings();
-            if (this.currentRoot) {
-              this.engine?.render(this.currentRoot, this.currentLayout);
-            }
+            void (async () => {
+              this.settings[p.key] = p.defaultVal;
+              colorBadge.setCssProps({ "--mm-badge-color": p.defaultVal });
+              await this.saveSettings();
+              if (this.currentRoot) {
+                this.engine?.render(this.currentRoot, this.currentLayout);
+              }
+            })();
           });
           
-          const label = wrap.createEl("span", {
+          wrap.createEl("span", {
             text: p.label,
             cls: "mm-color-label",
           });
@@ -607,12 +624,14 @@ export class MarkMyMindView extends ItemView {
         cls: `markmymind-btn markmymind-option-btn ${(this.settings.connectionStyle || "rounded") === opt.value ? "active" : ""}`,
         text: opt.text
       });
-      btn.addEventListener("click", async () => {
-        linesBtns.forEach(b => b.removeClass("active"));
-        btn.addClass("active");
-        this.settings.connectionStyle = opt.value as any;
-        await this.saveSettings();
-        if (this.currentRoot) this.engine?.render(this.currentRoot, this.currentLayout);
+      btn.addEventListener("click", () => {
+        void (async () => {
+          linesBtns.forEach(b => b.removeClass("active"));
+          btn.addClass("active");
+          this.settings.connectionStyle = opt.value as "curved" | "rounded" | "straight";
+          await this.saveSettings();
+          if (this.currentRoot) this.engine?.render(this.currentRoot, this.currentLayout);
+        })();
       });
       linesBtns.push(btn);
     });
@@ -629,17 +648,19 @@ export class MarkMyMindView extends ItemView {
       thicknessSelect.value = String(DEFAULT_SETTINGS.connectionWidth);
       if (this.currentRoot) this.engine?.render(this.currentRoot, this.currentLayout);
     });
-    thicknessSelect = thicknessContent.createEl("select", { cls: "markmymind-select" }) as HTMLSelectElement;
+    thicknessSelect = thicknessContent.createEl("select", { cls: "markmymind-select" });
     for (let w = 1; w <= 10; w++) {
       const opt = thicknessSelect.createEl("option", { value: String(w), text: `${w}px` });
       if (w === (this.settings.connectionWidth !== undefined ? this.settings.connectionWidth : 5)) {
         opt.selected = true;
       }
     }
-    thicknessSelect.addEventListener("change", async () => {
-      this.settings.connectionWidth = parseInt(thicknessSelect.value);
-      await this.saveSettings();
-      if (this.currentRoot) this.engine?.render(this.currentRoot, this.currentLayout);
+    thicknessSelect.addEventListener("change", () => {
+      void (async () => {
+        this.settings.connectionWidth = parseInt(thicknessSelect.value);
+        await this.saveSettings();
+        if (this.currentRoot) this.engine?.render(this.currentRoot, this.currentLayout);
+      })();
     });
 
     // ════════════════════════════════════════════════════════════
@@ -660,7 +681,7 @@ export class MarkMyMindView extends ItemView {
       alignSelect.value = "titleCenter";
       if (this.currentRoot) this.engine?.render(this.currentRoot, this.currentLayout);
     });
-    alignSelect = alignContent.createEl("select", { cls: "markmymind-select" }) as HTMLSelectElement;
+    alignSelect = alignContent.createEl("select", { cls: "markmymind-select" });
     const alignOptions = [
       { value: "titleCenter", text: t("alignment.titleCenter") },
       { value: "left", text: t("alignment.left") },
@@ -671,10 +692,12 @@ export class MarkMyMindView extends ItemView {
       const opt = alignSelect.createEl("option", { value: optInfo.value, text: optInfo.text });
       if (optInfo.value === (this.settings.textAlign || "titleCenter")) opt.selected = true;
     }
-    alignSelect.addEventListener("change", async () => {
-      this.settings.textAlign = alignSelect.value as any;
-      await this.saveSettings();
-      if (this.currentRoot) this.engine?.render(this.currentRoot, this.currentLayout);
+    alignSelect.addEventListener("change", () => {
+      void (async () => {
+        this.settings.textAlign = alignSelect.value as "left" | "center" | "right" | "titleCenter";
+        await this.saveSettings();
+        if (this.currentRoot) this.engine?.render(this.currentRoot, this.currentLayout);
+      })();
     });
 
     // — Divisor visual
@@ -694,10 +717,12 @@ export class MarkMyMindView extends ItemView {
       const opt = fontSelect.createEl("option", { value: String(sz), text: `${sz}px` });
       if (sz === (this.settings.fontSize || 12)) opt.selected = true;
     }
-    fontSelect.addEventListener("change", async () => {
-      this.settings.fontSize = parseInt(fontSelect.value);
-      await this.saveSettings();
-      if (this.currentRoot) this.engine?.render(this.currentRoot, this.currentLayout);
+    fontSelect.addEventListener("change", () => {
+      void (async () => {
+        this.settings.fontSize = parseInt(fontSelect.value);
+        await this.saveSettings();
+        if (this.currentRoot) this.engine?.render(this.currentRoot, this.currentLayout);
+      })();
     });
 
     // — Divisor visual
@@ -731,10 +756,12 @@ export class MarkMyMindView extends ItemView {
       const opt = widthSelect.createEl("option", { value: optInfo.value, text: optInfo.text });
       if (parseInt(optInfo.value) === (this.settings.nodeWidth || 0)) opt.selected = true;
     }
-    widthSelect.addEventListener("change", async () => {
-      this.settings.nodeWidth = parseInt(widthSelect.value);
-      await this.saveSettings();
-      if (this.currentRoot) this.engine?.render(this.currentRoot, this.currentLayout);
+    widthSelect.addEventListener("change", () => {
+      void (async () => {
+        this.settings.nodeWidth = parseInt(widthSelect.value);
+        await this.saveSettings();
+        if (this.currentRoot) this.engine?.render(this.currentRoot, this.currentLayout);
+      })();
     });
 
     // — Divisor visual
@@ -749,7 +776,7 @@ export class MarkMyMindView extends ItemView {
       limitSelect.value = String(DEFAULT_SETTINGS.maxNodeHeight);
       if (this.currentRoot) this.engine?.render(this.currentRoot, this.currentLayout);
     });
-    limitSelect = limitContent.createEl("select", { cls: "markmymind-select" }) as HTMLSelectElement;
+    limitSelect = limitContent.createEl("select", { cls: "markmymind-select" });
     const limitOptions = [
       { value: "0", text: t("height.noLimit") },
       { value: "100", text: "100px" },
@@ -768,10 +795,12 @@ export class MarkMyMindView extends ItemView {
       const opt = limitSelect.createEl("option", { value: optInfo.value, text: optInfo.text });
       if (parseInt(optInfo.value) === (this.settings.maxNodeHeight || 0)) opt.selected = true;
     }
-    limitSelect.addEventListener("change", async () => {
-      this.settings.maxNodeHeight = parseInt(limitSelect.value);
-      await this.saveSettings();
-      if (this.currentRoot) this.engine?.render(this.currentRoot, this.currentLayout);
+    limitSelect.addEventListener("change", () => {
+      void (async () => {
+        this.settings.maxNodeHeight = parseInt(limitSelect.value);
+        await this.saveSettings();
+        if (this.currentRoot) this.engine?.render(this.currentRoot, this.currentLayout);
+      })();
     });
 
   }
@@ -837,7 +866,7 @@ export class MarkMyMindView extends ItemView {
 
         const newMd = this.buildFullMarkdown();
         this.currentMdContent = newMd;
-        this.autoSave(newMd).then(() => {
+        void this.autoSave(newMd).then(() => {
           window.setTimeout(() => {
             this.isSyncing = false;
           }, 100);
@@ -856,7 +885,7 @@ export class MarkMyMindView extends ItemView {
     if (success) {
       const newMd = this.buildFullMarkdown();
       this.currentMdContent = newMd;
-      this.autoSave(newMd).then(() => {
+      void this.autoSave(newMd).then(() => {
         window.setTimeout(() => {
           this.isSyncing = false;
         }, 100);
@@ -886,7 +915,7 @@ export class MarkMyMindView extends ItemView {
       const frontmatterLayout = this.getLayoutFromFrontmatter(this.file);
       if (frontmatterLayout) {
         this.currentLayout = frontmatterLayout;
-        const layoutBtns = this.sidebarEl.querySelectorAll(".markmymind-grid-options button") as NodeListOf<HTMLButtonElement>;
+        const layoutBtns = this.sidebarEl.querySelectorAll<HTMLButtonElement>(".markmymind-grid-options button");
         layoutBtns.forEach((btn) => {
           if (btn.dataset.value) {
             btn.classList.toggle("active", btn.dataset.value === frontmatterLayout);
@@ -938,7 +967,7 @@ export class MarkMyMindView extends ItemView {
       const newMd = this.buildFullMarkdown();
       this.currentMdContent = newMd;
       this.setStatus("✓ Mapa → Markdown");
-      this.autoSave(newMd).then(() => {
+      void this.autoSave(newMd).then(() => {
         window.setTimeout(() => {
           this.isSyncing = false;
         }, 100);
@@ -989,7 +1018,7 @@ export class MarkMyMindView extends ItemView {
     this.isSyncing = true;
     this.currentMdContent = newMd;
     
-    this.autoSave(newMd).then(() => {
+    void this.autoSave(newMd).then(() => {
       window.setTimeout(() => {
         this.isSyncing = false;
       }, 100);
@@ -1027,7 +1056,7 @@ export class MarkMyMindView extends ItemView {
       const newMd = this.buildFullMarkdown();
       this.currentMdContent = newMd;
       this.setStatus("✓ Blocos removidos");
-      this.autoSave(newMd).then(() => {
+      void this.autoSave(newMd).then(() => {
         window.setTimeout(() => {
           this.isSyncing = false;
         }, 100);
@@ -1043,7 +1072,7 @@ export class MarkMyMindView extends ItemView {
   private setLayout(layout: LayoutType): void {
     const normalized = normalizeLayout(layout);
     this.currentLayout = normalized;
-    const layoutBtns = this.sidebarEl.querySelectorAll(".markmymind-grid-options button") as NodeListOf<HTMLButtonElement>;
+    const layoutBtns = this.sidebarEl.querySelectorAll<HTMLButtonElement>(".markmymind-grid-options button");
     layoutBtns.forEach((btn) => {
       if (btn.dataset.value) {
         btn.classList.toggle("active", btn.dataset.value === normalized);
@@ -1055,7 +1084,7 @@ export class MarkMyMindView extends ItemView {
       this.saveToHistory();
       this.isSyncing = true;
       this.currentMdContent = newMd;
-      this.autoSave(newMd).then(() => {
+      void this.autoSave(newMd).then(() => {
         window.setTimeout(() => {
           this.isSyncing = false;
         }, 100);
@@ -1071,7 +1100,7 @@ export class MarkMyMindView extends ItemView {
   private getLayoutFromFrontmatter(file: TFile | null): LayoutType | null {
     if (!file) return null;
     const cache = this.app.metadataCache.getFileCache(file);
-    const mmmLayout = cache?.frontmatter?.["mmm-layout"];
+    const mmmLayout = (cache?.frontmatter as Record<string, unknown> | undefined)?.["mmm-layout"];
     if (mmmLayout) {
       const cleanLayout = String(mmmLayout).trim().toLowerCase();
       if (cleanLayout === ">") return "right";
@@ -1119,7 +1148,7 @@ export class MarkMyMindView extends ItemView {
     targetEl: HTMLElement,
     settingKey: "colorH1" | "colorH2" | "colorH3" | "colorH4" | "colorH5" | "colorH6" | "colorH7" | "colorH8",
     defaultVal: string,
-    onColorChange: (newColor: string) => void
+    onColorChange: (newColor: string) => void | Promise<void>
   ): void {
     // Remove qualquer outro popover aberto
     const existing = activeDocument.querySelector(".markmymind-palette-popover");
@@ -1155,7 +1184,7 @@ export class MarkMyMindView extends ItemView {
         "--mm-box-shadow": boxShadow,
       });
       colorBox.addEventListener("click", () => {
-        onColorChange(color);
+        void onColorChange(color);
         popover.remove();
       });
     });
@@ -1181,7 +1210,7 @@ export class MarkMyMindView extends ItemView {
     });
 
     hiddenInput.addEventListener("input", () => {
-      onColorChange(hiddenInput.value);
+      void onColorChange(hiddenInput.value);
     });
 
     hiddenInput.addEventListener("change", () => {
@@ -1280,8 +1309,8 @@ export class MarkMyMindView extends ItemView {
 
   // ─── Undo / Redo (Desfazer / Refazer) ──────────────────────────────────────
 
-  private getHistory() {
-    if (!this.file || !this.plugin) return { undoStack: [] as string[], redoStack: [] as string[] };
+  private getHistory(): { undoStack: string[]; redoStack: string[] } {
+    if (!this.file || !this.plugin) return { undoStack: [], redoStack: [] };
     if (!this.plugin.historyMap) {
       this.plugin.historyMap = new Map();
     }
@@ -1316,7 +1345,7 @@ export class MarkMyMindView extends ItemView {
 
     this.isSyncing = true;
     this.currentMdContent = previousContent;
-    this.autoSave(previousContent).then(() => {
+    void this.autoSave(previousContent).then(() => {
       window.setTimeout(() => {
         this.isSyncing = false;
       }, 100);
@@ -1341,7 +1370,7 @@ export class MarkMyMindView extends ItemView {
 
     this.isSyncing = true;
     this.currentMdContent = nextContent;
-    this.autoSave(nextContent).then(() => {
+    void this.autoSave(nextContent).then(() => {
       window.setTimeout(() => {
         this.isSyncing = false;
       }, 100);
@@ -1401,12 +1430,12 @@ export class MarkMyMindView extends ItemView {
         this.engine?.focusOnSelected();
       } else if (isTitlesOnlyKey) {
         e.preventDefault();
-        this.cycleTitlesState();
+        void this.cycleTitlesState();
       } else if (isSingleH1RootKey) {
         e.preventDefault();
         this.settings.singleH1Root = !this.settings.singleH1Root;
         this.singleH1RootBtn?.classList.toggle("active", this.settings.singleH1Root);
-        this.saveSettings();
+        void this.saveSettings();
         this.syncMdToMap(this.currentMdContent, false);
         this.engine?.fitView();
       } else if (isLevelKey) {
@@ -1470,7 +1499,7 @@ export class MarkMyMindView extends ItemView {
           if (this.plugin) {
             this.plugin.markdownModeFiles.add(this.file.path);
           }
-          this.leaf.setViewState({
+          void this.leaf.setViewState({
             type: "markdown",
             state: { file: this.file.path },
             active: true,
@@ -1479,7 +1508,7 @@ export class MarkMyMindView extends ItemView {
       } else if (isSplitViewKey) {
         e.preventDefault();
         if (this.file && this.plugin) {
-          this.plugin.toggleSplitView(this.file, this.leaf);
+          void this.plugin.toggleSplitView(this.file, this.leaf);
         }
       }
     });
@@ -1493,7 +1522,7 @@ export class MarkMyMindView extends ItemView {
 
   // ─── Estado da View (persistência entre sessões) ───────────────────────────
 
-  getState(): Record<string, any> {
+  getState(): Record<string, unknown> {
     return { file: this.file?.path ?? null, layout: this.currentLayout };
   }
 
